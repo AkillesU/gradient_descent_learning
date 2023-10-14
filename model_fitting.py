@@ -13,7 +13,9 @@ part_ids = part_data['id'].drop_duplicates().tolist()
 
 
 """
-This function is correct. Use this as a template for the other use_"Strategy" functions
+use_"strategy" functions output the bug_id from a participant chosen bug given
+they used a particular strategy. This is later compared to the actual bug_id
+which was presented for a given trial.
 """
 def use_strong(Spreadsheet, stim):
     # Dictionary for getting bug_id for each dim_value (1,2)
@@ -199,7 +201,7 @@ def map_participant_to_spreadsheet(pid):
 
 
 def main():
-    n_trials = 11  # Change to 10
+    n_trials = 11  # 10 (+1 for the range function)
     strategies = ['strong', 'weak1', 'weak2', 'prototype']
     # Creating empty results dataframe
     columns = ['id',
@@ -275,13 +277,6 @@ def optimizer(strategies, Spreadsheet, trial, pid):
         f'Best neg log likelihood: {min_neg_log_likelihood:.2f}'
         )
     return best_strategy, best_alpha, min_neg_log_likelihood
-
-"""
-This function is used to check whether participants used the prototype
-strategy. If 4 or more characters match in the participants selected stimulus
-and the prototype label, this means that at least 2/3 of the dimensions match
-the prototype label. (e.g. 21221 and 11221 (2/3 matching))
-"""
 
 
 def joint_likelihood(alpha, strategy, Spreadsheet, trial, pid):
