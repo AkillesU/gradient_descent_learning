@@ -260,7 +260,7 @@ def main():
             results = pd.concat([results,new_data], ignore_index=True)
             print(results)
 
-    results.to_csv('results/model_fit_results.csv', index=False)
+    results.to_csv('results/model_fit_results.csv', index=False) #Comment this line to not save results
 
 def optimizer(strategies, Spreadsheet, trial, pid):
     best_strategy = ''
@@ -268,7 +268,7 @@ def optimizer(strategies, Spreadsheet, trial, pid):
     min_neg_log_likelihood = np.inf
     all_solutions = []
     for strategy in strategies:
-        alpha = 0.5 # initial guess
+        alpha = 0.1 # initial guess
         # Set bounds for alpha
         a_bounds = [(0,1)]
         # minimize negative log likelihood
@@ -276,9 +276,9 @@ def optimizer(strategies, Spreadsheet, trial, pid):
             joint_likelihood,
             alpha,
             args=(strategy, Spreadsheet, trial, pid), # I think "alpha" is not included here
-            method="L-BFGS-B", # This method supports bounds for "alpha"
+            method="SLSQP", # This method supports bounds for "alpha"
             options= {'maxiter': 100},
-            bounds = a_bounds
+            bounds = a_bounds,
         )
         # Save each strategies best alpha and neg log likelihood.
         all_solutions.append([res.x,res.fun])
@@ -305,8 +305,8 @@ def joint_likelihood(alpha, strategy, Spreadsheet, trial, pid):
     p = 1  # initialize joint likelihood
 
     # Full set of bug permutations: 8 bugs
-    entire_set = ['11121', '21111', '21221', '21121',
-                  '11221', '11111', '21211', '11211']
+    entire_set = [11121, 21111, 21221, 21121,
+                  11221, 11111, 21211, 11211]
 
     """
     Make a list of the four selections based on participant ID and trial number.
@@ -364,7 +364,7 @@ def joint_likelihood(alpha, strategy, Spreadsheet, trial, pid):
         p *= likelihood
 
     # return negative log likelihood
-    return -np.log(p)
+    return - np.log(p)
 
 if __name__ == '__main__':
     main()
