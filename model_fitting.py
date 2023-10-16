@@ -230,7 +230,10 @@ def main():
 
         for trial in range(1,n_trials):
             print("Trial:", trial)
-            best_strategy, best_alpha, best_neg_log_likelihood = optimizer(strategies, Spreadsheet, trial, pid)
+            best_strategy,\
+            best_alpha,\
+            best_neg_log_likelihood,\
+            all_solutions = optimizer(strategies, Spreadsheet, trial, pid)
 
             best_strategy_across_trials.append(best_strategy)
             best_strategy_alphas_across_trials.append(best_alpha)
@@ -238,12 +241,20 @@ def main():
             print(best_strategy_across_trials)
 
             # Save results.
-            new_data = pd.DataFrame({ # TODO: Add each strategies likelihood and alpha per trial
+            new_data = pd.DataFrame({
                 'id': [pid],
                 'trial': [trial],
-                'strategy': [best_strategy],
-                'alpha': [round(float(best_alpha),4)],
-                'nlog_likel': [best_neg_log_likelihood]
+                'best_strategy': [best_strategy],
+                'best_alpha': [round(float(best_alpha),4)],
+                'best_nlogl': [best_neg_log_likelihood],
+                'strong_alpha': all_solutions[0][0],
+                'strong_nlogl': all_solutions[0][1],
+                'weak1_alpha': all_solutions[1][0],
+                'weak1_nlogl': all_solutions[1][1],
+                'weak2_alpha': all_solutions[2][0],
+                'weak2_nlogl': all_solutions[2][1],
+                'proto_alpha': all_solutions[3][0],
+                'proto_nlogl': all_solutions[3][1],
             })
             # Concat new row to results dataframe
             results = pd.concat([results,new_data], ignore_index=True)
@@ -255,16 +266,23 @@ def optimizer(strategies, Spreadsheet, trial, pid):
     best_strategy = ''
     best_alpha = []
     min_neg_log_likelihood = np.inf
+    all_solutions = []
     for strategy in strategies:
         alpha = 0.5 # initial guess
+        # Set bounds for alpha
+        a_bounds = [(0,1)]
         # minimize negative log likelihood
         res = optimize.minimize(
             joint_likelihood,
             alpha,
             args=(strategy, Spreadsheet, trial, pid), # I think "alpha" is not included here
-            method="Nelder-Mead",
-            options= {'maxiter': 100}
+            method="L-BFGS-B", # This method supports bounds for "alpha"
+            options= {'maxiter': 100},
+            bounds = a_bounds
         )
+        # Save each strategies best alpha and neg log likelihood.
+        all_solutions.append([res.x,res.fun])
+
         if res.fun < min_neg_log_likelihood:
             best_strategy = strategy
             best_alpha = res.x
@@ -276,7 +294,7 @@ def optimizer(strategies, Spreadsheet, trial, pid):
         f'Best alpha: {best_alpha[0]:.2f} \n'
         f'Best neg log likelihood: {min_neg_log_likelihood:.2f}'
         )
-    return best_strategy, best_alpha, min_neg_log_likelihood
+    return best_strategy, best_alpha, min_neg_log_likelihood, all_solutions
 
 
 def joint_likelihood(alpha, strategy, Spreadsheet, trial, pid):
