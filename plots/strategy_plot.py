@@ -7,7 +7,7 @@ df = pd.read_csv("../results/model_fit_results.csv")
 fig, ax = plt.subplots(1, 2, figsize=(16, 6))
 
 # Plot 1: "Strategies across trials"
-strategies = ['strong', 'weak1', 'weak2', 'prototype']
+strategies = ['strong', 'weak1', 'weak2', 'prototype', 'guessing']
 colors = plt.cm.Paired(np.linspace(0, 1, len(strategies)))
 
 for i, strategy in enumerate(strategies):

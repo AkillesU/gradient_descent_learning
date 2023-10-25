@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import pandas as pd
 from scipy import optimize
@@ -206,7 +208,9 @@ def main():
     # Creating empty results dataframe
     columns = ['id',
                'trial',
-               'best_strategy',
+               'best_strategy_rand',
+               'best_strategy_guess',
+               'best_strategies',
                'best_alpha',
                'best_nlogl',
                'strong_alpha',
@@ -224,27 +228,34 @@ def main():
         print("Participant", pid)
         Spreadsheet = map_participant_to_spreadsheet(pid)
 
-        best_strategy_across_trials = []
+        best_strategy_rand_across_trials = []
+        best_strategy_guess_across_trials = []
         best_strategy_alphas_across_trials = []
         best_strategy_neg_log_likelihood_across_trials = []
 
         for trial in range(1,n_trials):
             print("Trial:", trial)
-            best_strategy,\
+            best_strategy_rand,\
+            best_strategy_guess,\
+            best_strategy_duplicates,\
             best_alpha,\
             best_neg_log_likelihood,\
             all_solutions = optimizer(strategies, Spreadsheet, trial, pid)
 
-            best_strategy_across_trials.append(best_strategy)
+            best_strategy_rand_across_trials.append(best_strategy_rand)
+            best_strategy_guess_across_trials.append(best_strategy_guess)
             best_strategy_alphas_across_trials.append(best_alpha)
             best_strategy_neg_log_likelihood_across_trials.append(best_neg_log_likelihood)
-            print(best_strategy_across_trials)
+            print(best_strategy_rand_across_trials)
+            print(best_strategy_guess_across_trials)
 
             # Save results.
             new_data = pd.DataFrame({
                 'id': [pid],
                 'trial': [trial],
-                'best_strategy': [best_strategy],
+                'best_strategy_rand': [best_strategy_rand],
+                'best_strategy_guess': [best_strategy_guess],
+                'best_strategies': [best_strategy_duplicates],
                 'best_alpha': [round(float(best_alpha),4)],
                 'best_nlogl': [best_neg_log_likelihood],
                 'strong_alpha': all_solutions[0][0],
@@ -264,9 +275,12 @@ def main():
 
 def optimizer(strategies, Spreadsheet, trial, pid):
     best_strategy = ''
+    best_strategy_guess = ''
+    best_strategy_rand = ''
     best_alpha = []
     min_neg_log_likelihood = np.inf
     all_solutions = []
+    best_strategy_duplicates = []
     for strategy in strategies:
         alpha = 0.1 # initial guess
         # Set bounds for alpha
@@ -275,26 +289,59 @@ def optimizer(strategies, Spreadsheet, trial, pid):
         res = optimize.minimize(
             joint_likelihood,
             alpha,
-            args=(strategy, Spreadsheet, trial, pid), # I think "alpha" is not included here
+            args=(strategy, Spreadsheet, trial, pid), # alpha not included here
             method="SLSQP", # This method supports bounds for "alpha"
-            options= {'maxiter': 100},
+            options= {'maxiter': 1000},
             bounds = a_bounds,
         )
         # Save each strategies best alpha and neg log likelihood.
         all_solutions.append([res.x,res.fun])
+        print("res.fun: ", round(res.fun,6))
+        """
+        When two strategies match in their likelihoods: res.fun == neg_log... 
+        Option 1. best_strategy = guessing
+        Option 2. Select a random strategy from the matching ones...
+        """
+        # TODO make best_strategy_rand and best_strategy_guess
 
-        if res.fun < min_neg_log_likelihood:
-            best_strategy = strategy
+        if round(res.fun,6) == round(min_neg_log_likelihood,6):
             best_alpha = res.x
             min_neg_log_likelihood = res.fun
 
+            if len(best_strategy_duplicates) == 2 or len(best_strategy_duplicates) == 3:
+                best_strategy_duplicates.append(strategy)
+            elif len(best_strategy_duplicates) == 0:
+                best_strategy_duplicates = [best_strategy, strategy]
+            else:
+                print("Too many best strategies in 'best_strategy_duplicates'")
 
-    print(
-        f'Best strategy: {best_strategy}, \n'
-        f'Best alpha: {best_alpha[0]:.2f} \n'
-        f'Best neg log likelihood: {min_neg_log_likelihood:.2f}'
-        )
-    return best_strategy, best_alpha, min_neg_log_likelihood, all_solutions
+        if res.fun < min_neg_log_likelihood:
+            best_strategy = strategy # Updating best strategy
+            best_alpha = res.x
+            min_neg_log_likelihood = res.fun
+
+    # If there are duplicate best strategies, select one at random and add "guessing" to best_strategy_guess
+    if best_strategy_duplicates != []:
+        print("best_strategy_duplicates", best_strategy_duplicates)
+
+        # Set seed for random choice
+        random.seed(12345)
+        best_strategy_rand = random.choice(list(best_strategy_duplicates))
+        print("Selected:",best_strategy_rand)
+
+        # Add "guessing" strategy
+        best_strategy_guess = "guessing"
+        # TODO: Set best_alpha to the random strategy chosen...
+    else:
+        best_strategy_guess = best_strategy
+        best_strategy_rand = best_strategy
+        best_strategy_duplicates = best_strategy
+
+    print(f'Best strategy random: {best_strategy_rand}, '
+          f'\n'f'Best strategy guess: {best_strategy_guess} '
+          f'\n'f'Best alpha: {best_alpha[0]:.2f} '
+          f'\n'f'Best neg log likelihood: {min_neg_log_likelihood:.2f}')
+    return best_strategy_rand, best_strategy_guess, best_strategy_duplicates, best_alpha, min_neg_log_likelihood, all_solutions
 
 
 def joint_likelihood(alpha, strategy, Spreadsheet, trial, pid):
