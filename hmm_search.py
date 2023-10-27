@@ -11,16 +11,14 @@ lengths = [10]*10
 bic = []
 aic = []
 lls = []
-ns = [1,2,3,4,5,6,7,8]
+ns = [2,3,4,5,6]
 def select_best_model(X):
-    best_score = 0
-    best_num_states = None
 
     for n_states in ns:
         best_ll = None
         best_model = None
         print(best_ll)
-        for q in range(10):
+        for q in range(100):
             print(q)
             # Train the HMM
             model = hmm.MultinomialHMM(n_components=n_states,
@@ -51,6 +49,8 @@ def select_best_model(X):
     fig.tight_layout()
 
     plt.show()
+
+
 
 
 best_num_states = select_best_model(sequence)
