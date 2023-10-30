@@ -1,38 +1,43 @@
-import graphviz
+import matplotlib.pyplot as plt
+import networkx as nx
 import pickle
 
-# Load the model from the pickle file
-with open('../results/best_model.pkl', 'rb') as file:
+with open("../results/best_model.pkl", "rb") as file:
     model = pickle.load(file)
 
-print(model.emissionprob_.shape)
+n_states = model.n_states
+transition_probabilities = model.transition_prob_
+emission_probabilities = model.emission_prob_
+starting_probabilities = model.start_prob_
 
+# Create graph
+G = nx.DiGraph()
 
-def generate_dot(model, state_names, observation_labels):
-    dot = graphviz.Digraph('HMM', format='png')
+# Add nodes
+for s in range(n_states):
+    G.add_node(s)
 
-    # Add states
-    for i, state in enumerate(state_names):
-        label = "{}\n".format(state)
-        for j, obs in enumerate(observation_labels):
-            label += "P({})={:.2f} ".format(obs, model.emissionprob_[i][j])
-        dot.node(str(i), label)
+# Add edges for transitions
+for i in range(n_states):
+    for j in range(n_states):
+        G.add_edge(i, j, weight=transition_probabilities[i, j])
 
-    # Add transitions
-    for i, origin_state in enumerate(state_names):
-        for j, destination_state in enumerate(state_names):
-            if model.transmat_[i][j] > 0:
-                dot.edge(str(i), str(j), label="{:.2f}".format(model.transmat_[i][j]))
+# Draw graph
+pos = nx.spring_layout(G)
+plt.figure(figsize=(10, 8))
+nx.draw_networkx_nodes(G, pos, node_size=3000)
+nx.draw_networkx_edges(G, pos)
+nx.draw_networkx_labels(G, pos)
+labels = {(i, j): '{:.2f}'.format(transition_probabilities[i][j]) for i, j in G.edges()}
+nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
 
-    # Add start probabilities
-    for i, state in enumerate(state_names):
-        dot.edge('start', str(i), label="{:.2f}".format(model.startprob_[i]))
+# Display emission probabilities
+for i, (x, y) in pos.items():
+    plt.text(x, y - 0.15, f'E: {emission_probabilities[i]}', horizontalalignment='center', verticalalignment='center')
 
-    return dot
+# Display starting probabilities (optional)
+for i, (x, y) in pos.items():
+    plt.text(x, y + 0.15, f'S: {starting_probabilities[i]:.2f}', horizontalalignment='center', verticalalignment='center')
 
-# Example usage
-state_names = ['State1', 'State2', 'State3', 'State4']
-observation_labels = ['strong', 'weak1', 'weak2', 'prototype']
-
-dot = generate_dot(model, state_names, observation_labels)
-dot.render('hmm_graph', view=True)
+plt.title('Hidden Markov Model Visualization')
+plt.show()
