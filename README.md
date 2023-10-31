@@ -46,9 +46,44 @@ It also contains three columns with alternative ways of deriving the *best_strat
 
 ### Data preprocessing
 
-`hmm_data.py`: Reads in `model_fit_results.csv`
+`hmm_data.py`: Reads in `model_fit_results.csv` and generates three .csv files with the following templates:
+
+under `/hmm_data`:
 
 
 
+
+**FOR:** 
+`/hmm_data_best_strategy_rand.csv` & `/hmm_data_best_strategies.csv` 
+
+| Strong | Weak1 | Weak 2 | Prototype |
+| ----------- | ----------- | ----------- | ----------- |
+| NaN | NaN | NaN | NaN |
+
+**FOR:**
+`/hmm_data_best_strategy_guess.csv`
+| Strong | Weak1 | Weak 2 | Prototype | Guessing |
+| ----------- | ----------- | ----------- | ----------- | ----------- |
+| NaN | NaN | NaN | NaN | NaN |
+
+
+### HMM search
+`hmm_search.py`: Searches for the optimal number of hidden states based on AIC and BIC. Shows a plot with AIC and BIC values for each number of hidden states.
+
+### HMM fit
+
+`hmm_test.py`: Fits 1000 randomly initialised HMMs with a set number of hidden states.
+
+**Outputs**: 
+- The best model (`/hmm_results/best_model_states_X.pkl`)
+- Inferred states for each trial (`/hmm_results/hmm_results_states_X.csv`).
+
+---
+
+## Plots `/plots`
+
+`alpha_plot.py`: Plots the average guessing parameter (alpha) across trials for all strategies
+`strategy_plot.py`: Plots the average use of strategies (likelihood model) across trials
+`hmm_plot.py`: Plots the HMM model parameters as a graph
 
 
