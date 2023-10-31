@@ -29,6 +29,7 @@ plt.ylabel('Value')
 plt.legend()
 plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 plt.tight_layout()
-plt.show()
 plt.savefig(f"images/alpha_plot_part{n_participants}")
+
+plt.show()
 

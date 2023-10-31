@@ -58,7 +58,8 @@ def select_best_model(X):
     ax.set_xlabel("Number of HMM Components")
     fig.tight_layout()
 
+    plt.savefig(f"hmm_results/hmm_search_part{int(len(trials) / 10)}_{file_num[data_path]}")
     plt.show()
-    plt.savefig(f"hmm_results/hmm_search_part{int(len(trials)/10)}_{file_num[data_path]}")
+
 
 select_best_model(sequence)

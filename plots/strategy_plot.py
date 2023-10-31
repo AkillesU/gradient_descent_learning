@@ -37,5 +37,5 @@ ax[1].set_ylabel("Count")
 ax[1].grid(True, axis='y', linestyle='--', linewidth=0.5)
 
 plt.tight_layout()
-plt.show()
 plt.savefig(f"images/strategy_plot_part{n_participants}")
+plt.show()
