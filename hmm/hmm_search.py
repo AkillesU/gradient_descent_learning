@@ -2,32 +2,42 @@ from hmmlearn import hmm
 import matplotlib.pyplot as plt
 import pandas as pd
 
-sequence = pd.read_csv("hmm_data/hmm_data_best_strategies.csv")
+data_path = "hmm_data_best_strategies.csv"
+sequence = pd.read_csv(f"hmm_data/{data_path}")
+
+file_num = {
+"hmm_data_best_strategies.csv": 1,
+"hmm_data_best_strategy_guess.csv": 2,
+"hmm_data_best_strategy_rand.csv": 3
+}
 
 print(sequence.shape)
-trials = sequence.sum(axis=1)
-lengths = [10]*10
+trials = sequence.sum(axis=1) # Set trials variable for "n_trials" arg in MultinomialHMM
+lengths = [10]*10 # Set lengths variable for "lengths" arg in model.fit
 
-bic = []
-aic = []
-lls = []
-ns = [2,3,4,5,6]
+bic = []  # Initialise list of BIC values
+aic = []  # Initialise list of AIC values
+lls = []  # Initialise list of log likelihood values
+ns = [2, 3, 4, 5, 6]  # Set list containing number of states
+
+# This function fits 100 randomly initialised MultinomialHMM models with the data and selects the best model.
+# The process is repeated for each n_states and the results (AIC,BIC,LogLikel) are saved and plotted.
+
 def select_best_model(X):
 
     for n_states in ns:
         best_ll = None
         best_model = None
-        print(best_ll)
         for q in range(100):
             print(q)
             # Train the HMM
             model = hmm.MultinomialHMM(n_components=n_states,
                                        n_iter=1000,
                                        n_trials=trials)
-            model.n_features = 4
+            model.n_features = 4  # Set number of features. (Should be 5 if using best_strategy_guess)
             model.fit(X, lengths=lengths)
 
-            score = model.score(X)
+            score = model.score(X)  # Get log likelihood for model fit
             if not best_ll or best_ll < best_ll:
                 best_ll = score
                 best_model = model
@@ -36,22 +46,19 @@ def select_best_model(X):
         lls.append(best_model.score(X))
 
     fig, ax = plt.subplots()
-    ln1 = ax.plot(ns, aic, label="AIC", color="blue", marker="o")
-    ln2 = ax.plot(ns, bic, label="BIC", color="green", marker="o")
+    ax.plot(ns, aic, label="AIC", color="blue", marker="o")
+    ax.plot(ns, bic, label="BIC", color="green", marker="o")
     ax2 = ax.twinx()
-    ln3 = ax2.plot(ns, lls, label="LL", color="orange", marker="o")
+    ax2.plot(ns, lls, label="LL", color="orange", marker="o")
 
     ax.legend(handles=ax.lines + ax2.lines)
-    ax.set_title("Using AIC/BIC for Model Selection")
+    ax.set_title(data_path)
     ax.set_ylabel("Criterion Value (lower is better)")
     ax2.set_ylabel("LL (higher is better)")
     ax.set_xlabel("Number of HMM Components")
     fig.tight_layout()
 
     plt.show()
+    plt.savefig(f"hmm_results/hmm_search_part{int(len(trials)/10)}_{file_num[data_path]}")
 
-
-
-
-best_num_states = select_best_model(sequence)
-print(f"The best number of states based on aic is: {best_num_states}")
+select_best_model(sequence)
