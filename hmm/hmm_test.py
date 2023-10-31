@@ -67,7 +67,7 @@ print(f"Emission_probabilities: {np.around(best_model.emissionprob_,3)}\n",
 
 import pickle
 
-with open("hmm_results/best_model.pkl", "wb") as file:
+with open(f"hmm_results/best_model_states_{n_components}.pkl", "wb") as file:
     pickle.dump(best_model, file)
 
 results = best_model.predict(sequence, lengths=lengths)
