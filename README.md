@@ -58,13 +58,13 @@ under `/hmm_data`:
 
 | Strong | Weak1 | Weak 2 | Prototype |
 | ----------- | ----------- | ----------- | ----------- |
-| NaN | NaN | NaN | NaN |
+| 0/1 | 0/1 | 0/1 | 0/1 |
 
 **FOR:**
 `/hmm_data_best_strategy_guess.csv`
 | Strong | Weak1 | Weak 2 | Prototype | Guessing |
 | ----------- | ----------- | ----------- | ----------- | ----------- |
-| NaN | NaN | NaN | NaN | NaN |
+| 0/1 | 0/1 | 0/1 | 0/1 | 0/1 |
 
 
 ### HMM search
@@ -83,7 +83,9 @@ under `/hmm_data`:
 ## Plots `/plots`
 
 `alpha_plot.py`: Plots the average guessing parameter (alpha) across trials for all strategies
+
 `strategy_plot.py`: Plots the average use of strategies (likelihood model) across trials
+
 `hmm_plot.py`: Plots the HMM model parameters as a graph
 
 
