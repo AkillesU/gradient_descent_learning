@@ -1,12 +1,10 @@
 import ast
-
 import pandas as pd
 
 initial_data = pd.read_csv("../likelihood_model/likel_results/model_fit_results.csv")
 
-# How to deal with duplicates?
-
-methods = ["best_strategies","best_strategy_rand","best_strategy_guess" ]
+# Creating list of methods to deal with equally likely strategies
+methods = ["best_strategies", "best_strategy_rand", "best_strategy_guess" ]
 
 """
 best_strategy_rand: A random strategy is selected from equally likely strategies for a given trial
@@ -16,11 +14,14 @@ best_strategy_guess: When two or more strategies are equally as likely for a giv
 
 best_strategies: Outputs all equally likely strategies in a list []
 """
-
+# For each method, create a .csv file with columns for all strategies.
+# If a strategy is being used on a trial, the value is set to 1
+# if not, the value is set to 0.
 for method in methods:
 
     data = initial_data[method]
 
+    # Creating a dictionary to map strategies to an index on the df
     strategy_to_idx = {
         'strong': 0,
         'weak1': 1,
@@ -35,7 +36,7 @@ for method in methods:
         # Check if the current row's data is a string representation of a list or just a single string
         item = data[row]
         if "[" in item and "]" in item:  # Check for brackets to identify lists
-            strategies = ast.literal_eval(item)
+            strategies = ast.literal_eval(item) # Convert string list "[]" into a list []
         else:
             strategies = [item]
 
