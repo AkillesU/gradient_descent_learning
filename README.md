@@ -88,4 +88,10 @@ under `/hmm_data`:
 
 `hmm_plot.py`: Plots the HMM model parameters as a graph
 
+---
+
+## Analysis Procedure
+
+**TODO**
+
 
