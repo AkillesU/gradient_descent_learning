@@ -35,10 +35,10 @@ for i, row in enumerate(transition_probabilities):  # For every row (hidden stat
 
 # Draw graph
 pos = nx.circular_layout(G)  # Set graph shape
-plt.figure(figsize=(10, 8))  # Set figure size
+fig, ax = plt.subplots(figsize=(10, 8))  # Initialise figure
 
 # Initialise network graph
-nx.draw(G, pos, with_labels=False, node_size=3000, node_color='skyblue', font_weight='bold', arrowsize=20)
+nx.draw(G, pos,ax=ax, with_labels=False, node_size=3000, node_color='skyblue', font_weight='bold', arrowsize=20)
 
 # Draw starting probabilities inside nodes
 for i, prob in enumerate(starting_probabilities):
@@ -55,9 +55,10 @@ for (i, j), label in edge_labels.items():
 
 # Draw emission probabilities next to nodes
 for i, emissions in enumerate(emission_probabilities):
-    plt.text(pos[i][0], pos[i][1]-0.15, f'{emissions}', fontsize=10, ha='center', va='center')
+    plt.text(pos[i][0], pos[i][1]-0.2, f'{emissions}', fontsize=10, ha='center', va='center')
 
-plt.title(f'Hidden Markov Model Visualization ({n_states} states)')
+ax.set_title(f'Hidden Markov Model Visualization ({n_states} states)')
+
 plt.savefig(f"images/hmm_graph_s{n_states}_part{n_participants}.png")
 plt.show()
 
