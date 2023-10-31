@@ -15,6 +15,9 @@ print(transition_probabilities,
       emission_probabilities,
       starting_probabilities,
       n_states)
+
+n_participants = int(len(model.n_trials)/10)
+
 # Create graph
 G = nx.DiGraph()
 
@@ -53,5 +56,6 @@ for i, emissions in enumerate(emission_probabilities):
 plt.title('Hidden Markov Model Visualization')
 plt.show()
 
+plt.savefig(f"images/hmm_graph_s{n_states}_part{n_participants}.png")
 
 
