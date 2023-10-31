@@ -5,6 +5,8 @@ import numpy as np
 
 df = pd.read_csv("../likelihood_model/likel_results/model_fit_results.csv")
 
+n_participants = int(len(df)/10)
+
 grouped_means = df.groupby('trial').mean()
 grouped_stds = df.groupby('trial').std()
 grouped_counts = df.groupby('trial').count()
@@ -28,4 +30,5 @@ plt.legend()
 plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 plt.tight_layout()
 plt.show()
+plt.savefig(f"images/alpha_plot_part{n_participants}")
 
