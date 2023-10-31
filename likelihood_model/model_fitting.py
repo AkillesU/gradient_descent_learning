@@ -12,13 +12,13 @@ code_file = pd.read_csv("../data/fullcode.csv", delimiter=";")
 # Creating list of participant IDs. Order is maintained.
 part_ids = part_data['id'].drop_duplicates().tolist()
 
-
-
 """
 use_"strategy" functions output the bug_id from a participant chosen bug given
 they used a particular strategy. This is later compared to the actual bug_id
 which was presented for a given trial.
 """
+
+
 def use_strong(Spreadsheet, stim):
     # Dictionary for getting bug_id for each dim_value (1,2)
     dim_val_to_bug_id = {
@@ -31,13 +31,13 @@ def use_strong(Spreadsheet, stim):
             (code_file['Spreadsheet'] == Spreadsheet) &  # Match Spreadsheet
             (code_file['feature_type'] == 'strong') &  # Match feature_type
             (code_file['dim_value'] == 2)  # Match dim_value
-            ]['bug_id'].iloc[0] # Get bug_id for dim_value == 1
+            ]['bug_id'].iloc[0]  # Get bug_id for dim_value == 1
     }
 
     strong_dimension = code_file[
-        (code_file['Spreadsheet'] == Spreadsheet) &  # Match Spreadsheet
-        (code_file['feature_type'] == 'strong') # Match feature_type == 'strong'
-        ]['dimension'].iloc[0] -1 # Get dimension (- 1 to get indexer)
+                           (code_file['Spreadsheet'] == Spreadsheet) &  # Match Spreadsheet
+                           (code_file['feature_type'] == 'strong')  # Match feature_type == 'strong'
+                           ]['dimension'].iloc[0] - 1  # Get dimension (- 1 to get indexer)
     stim = str(stim)
     # Get bug_id from participant stim, given strategy == 'strong'
     true_label = dim_val_to_bug_id[stim[(strong_dimension)]]
@@ -46,7 +46,6 @@ def use_strong(Spreadsheet, stim):
 
 
 def use_weak1(Spreadsheet, stim):
-
     # Filter the code_file to contain only rows with Spreadsheet and 'weak' features
     filtered_data = code_file[
         (code_file['Spreadsheet'] == Spreadsheet) &  # Match Spreadsheet
@@ -59,14 +58,14 @@ def use_weak1(Spreadsheet, stim):
     # Dictionary for getting bug_id for each dim_value (1,2)
     dim_val_to_bug_id = {
         '1': filtered_data[(
-                (filtered_data['dimension'] == smallest_dimension) & # Select Weak features with lower dimension
-                (filtered_data['dim_value'] == 1)) # Match dim_value
-                ]['bug_id'].iloc[0],  # Get bug_id for dim_value == 1
+                (filtered_data['dimension'] == smallest_dimension) &  # Select Weak features with lower dimension
+                (filtered_data['dim_value'] == 1))  # Match dim_value
+        ]['bug_id'].iloc[0],  # Get bug_id for dim_value == 1
 
         '2': filtered_data[(
-                (filtered_data['dimension'] == smallest_dimension) & # Select Weak features with lower dimension
-                (filtered_data['dim_value'] == 2)) # Match dim_value
-                ]['bug_id'].iloc[0] # Get bug_id for dim_value == 2
+                (filtered_data['dimension'] == smallest_dimension) &  # Select Weak features with lower dimension
+                (filtered_data['dim_value'] == 2))  # Match dim_value
+        ]['bug_id'].iloc[0]  # Get bug_id for dim_value == 2
     }
 
     # Setting weak1_dimension based on the smaller dimension (- 1 to get indexer)
@@ -91,31 +90,33 @@ def use_weak2(Spreadsheet, stim):
     # Dictionary for getting bug_id for each dim_value (1,2)
     dim_val_to_bug_id = {
         '1': filtered_data[(
-                (filtered_data['dimension'] == largest_dimension) & # Select Weak features with larger dimension
-                (filtered_data['dim_value'] == 1)) # Match dim_value
-                ]['bug_id'].iloc[0], # Get bug_id for dim_value == 1
+                (filtered_data['dimension'] == largest_dimension) &  # Select Weak features with larger dimension
+                (filtered_data['dim_value'] == 1))  # Match dim_value
+        ]['bug_id'].iloc[0],  # Get bug_id for dim_value == 1
 
         '2': filtered_data[(
-                (filtered_data['dimension'] == largest_dimension) & # Select Weak features with larger dimension
-                (filtered_data['dim_value'] == 2)) # Match dim_value
-                ]['bug_id'].iloc[0] # Get bug_id for dim_value == 2
+                (filtered_data['dimension'] == largest_dimension) &  # Select Weak features with larger dimension
+                (filtered_data['dim_value'] == 2))  # Match dim_value
+        ]['bug_id'].iloc[0]  # Get bug_id for dim_value == 2
     }
 
     # Setting weak2_dimension based on the larger dimension (- 1 to get indexer)
-    weak2_dimension = largest_dimension -1
+    weak2_dimension = largest_dimension - 1
     stim = str(stim)
     # Get bug_id for participant stim based on strategy 'weak2'
     true_label = dim_val_to_bug_id[stim[(weak2_dimension)]]
 
     return true_label
 
+
 """
 For the prototype strategy we check which label each dimension gives out.
 If two or more dimensions point towards a bug_id, the true_label will be that bug_id.
 """
-def use_prototype(Spreadsheet, stim):
 
-    # Dicitionary for getting bug_id for each dim_value in the first dimension
+
+def use_prototype(Spreadsheet, stim):
+    # Dictionary for getting bug_id for each dim_value in the first dimension
     first_dim = {
         '1': code_file[
             (code_file['Spreadsheet'] == Spreadsheet) &  # Match Spreadsheet
@@ -130,7 +131,7 @@ def use_prototype(Spreadsheet, stim):
             ]['bug_id'].iloc[0]  # Get bug_id for dimension == 1, dim_value == 2
     }
 
-    # Dicitionary for getting bug_id for each dim_value in the third dimension
+    # Dictionary for getting bug_id for each dim_value in the third dimension
     third_dim = {
         '1': code_file[
             (code_file['Spreadsheet'] == Spreadsheet) &  # Match Spreadsheet
@@ -145,7 +146,7 @@ def use_prototype(Spreadsheet, stim):
             ]['bug_id'].iloc[0]  # Get bug_id for dimension == 3, dim_value == 2
     }
 
-    # Dicitionary for getting bug_id for each dim_value in the fourth dimension
+    # Dictionary for getting bug_id for each dim_value in the fourth dimension
     fourth_dim = {
         '1': code_file[
             (code_file['Spreadsheet'] == Spreadsheet) &  # Match Spreadsheet
@@ -161,12 +162,13 @@ def use_prototype(Spreadsheet, stim):
     }
     stim = str(stim)
     votes = []
-    votes.append(first_dim[stim[0]]) # Get bug_id from first dimension
-    votes.append(third_dim[stim[2]]) # Get bug_id from third dimension
-    votes.append(fourth_dim[stim[3]]) # Get bug_id from fourht dimension
+    votes.append(first_dim[stim[0]])  # Get bug_id from first dimension
+    votes.append(third_dim[stim[2]])  # Get bug_id from third dimension
+    votes.append(fourth_dim[stim[3]])  # Get bug_id from fourth dimension
 
     n_bug_id_1 = 0
     n_bug_id_2 = 0
+
     for n in votes:
         if n == 1:
             n_bug_id_1 += 1
@@ -183,14 +185,13 @@ def use_prototype(Spreadsheet, stim):
 
 # Read which bug_id a participant was choosing bugs for on a given trial
 def read_participant_choice(pid, trial):
-
-    part_label = part_data[((part_data['id'] == pid) & # Match participant ID
-                            (part_data['trial'] == trial)) # Match trial number
-                            ]['bug_id'].iloc[0] # Get bug_id of that test trial
+    part_label = part_data[((part_data['id'] == pid) &  # Match participant ID
+                            (part_data['trial'] == trial))  # Match trial number
+    ]['bug_id'].iloc[0]  # Get bug_id of that test trial
     return part_label
 
 
-# Funtion to extract Spreadsheet based on participant ID.
+# Function to extract Spreadsheet based on participant ID.
 def map_participant_to_spreadsheet(pid):
     # Find the first row with the correct pid
     row = part_data[part_data['id'] == pid].iloc[0]
@@ -199,7 +200,6 @@ def map_participant_to_spreadsheet(pid):
     Spreadsheet = row['Spreadsheet']
 
     return Spreadsheet
-
 
 
 def main():
@@ -233,13 +233,13 @@ def main():
         best_strategy_alphas_across_trials = []
         best_strategy_neg_log_likelihood_across_trials = []
 
-        for trial in range(1,n_trials):
+        for trial in range(1, n_trials):
             print("Trial:", trial)
-            best_strategy_rand,\
-            best_strategy_guess,\
-            best_strategy_duplicates,\
-            best_alpha,\
-            best_neg_log_likelihood,\
+            best_strategy_rand, \
+            best_strategy_guess, \
+            best_strategy_duplicates, \
+            best_alpha, \
+            best_neg_log_likelihood, \
             all_solutions = optimizer(strategies, Spreadsheet, trial, pid)
 
             best_strategy_rand_across_trials.append(best_strategy_rand)
@@ -256,7 +256,7 @@ def main():
                 'best_strategy_rand': [best_strategy_rand],
                 'best_strategy_guess': [best_strategy_guess],
                 'best_strategies': [best_strategy_duplicates],
-                'best_alpha': [round(float(best_alpha),4)],
+                'best_alpha': [round(float(best_alpha), 4)],
                 'best_nlogl': [best_neg_log_likelihood],
                 'strong_alpha': all_solutions[0][0],
                 'strong_nlogl': all_solutions[0][1],
@@ -268,46 +268,40 @@ def main():
                 'proto_nlogl': all_solutions[3][1],
             })
             # Concat new row to likel_results dataframe
-            results = pd.concat([results,new_data], ignore_index=True)
+            results = pd.concat([results, new_data], ignore_index=True)
             print(results)
 
-    results.to_csv('likel_results/model_fit_results.csv', index=False) #Comment this line to not save likel_results
+    results.to_csv(f'likel_results/model_fit_results.csv', index=False)  # Comment this line to not save likel_results
+
 
 def optimizer(strategies, Spreadsheet, trial, pid):
     best_strategy = ''
-    best_strategy_guess = ''
-    best_strategy_rand = ''
     best_alpha = []
     min_neg_log_likelihood = np.inf
     all_solutions = []
     best_strategy_duplicates = []
     for strategy in strategies:
-        alpha = 0.1 # initial guess
+        alpha = 0.5  # initial guess
         # Set bounds for alpha
-        a_bounds = [(0,1)]
+        a_bounds = [(0, 1)]
         # minimize negative log likelihood
         res = optimize.minimize(
             joint_likelihood,
             alpha,
-            args=(strategy, Spreadsheet, trial, pid), # alpha not included here
-            method="SLSQP", # This method supports bounds for "alpha"
-            options= {'maxiter': 1000},
-            bounds = a_bounds,
+            args=(strategy, Spreadsheet, trial, pid),  # alpha not included here
+            method="SLSQP",  # This method supports bounds for "alpha"
+            options={'maxiter': 1000},
+            bounds=a_bounds,
         )
         # Save each strategies best alpha and neg log likelihood.
-        all_solutions.append([res.x,res.fun])
-        print("res.fun: ", round(res.fun,6))
-        """
-        When two strategies match in their likelihoods: res.fun == neg_log... 
-        Option 1. best_strategy = guessing
-        Option 2. Select a random strategy from the matching ones...
-        """
-        # TODO make best_strategy_rand and best_strategy_guess
+        all_solutions.append([res.x, res.fun])
+        print("res.fun: ", round(res.fun, 6))
 
-        if round(res.fun,6) == round(min_neg_log_likelihood,6):
+        if round(res.fun, 6) == round(min_neg_log_likelihood, 6):
             best_alpha = res.x
             min_neg_log_likelihood = res.fun
 
+            # If there are equally likely best_strategies, add them to best_strategy_duplicates
             if len(best_strategy_duplicates) == 2 or len(best_strategy_duplicates) == 3:
                 best_strategy_duplicates.append(strategy)
             elif len(best_strategy_duplicates) == 0:
@@ -316,9 +310,9 @@ def optimizer(strategies, Spreadsheet, trial, pid):
                 print("Too many best strategies in 'best_strategy_duplicates'")
 
         if res.fun < min_neg_log_likelihood:
-            best_strategy = strategy # Updating best strategy
-            best_alpha = res.x
-            min_neg_log_likelihood = res.fun
+            best_strategy = strategy  # Updating best strategy
+            best_alpha = res.x  # Updating best_alpha
+            min_neg_log_likelihood = res.fun  # Updating best log_likelihood
 
     # If there are duplicate best strategies, select one at random and add "guessing" to best_strategy_guess
     if best_strategy_duplicates != []:
@@ -326,13 +320,14 @@ def optimizer(strategies, Spreadsheet, trial, pid):
 
         # Set seed for random choice
         random.seed(12345)
+
+        # Select a random strategy from best_strategy_duplicates
         best_strategy_rand = random.choice(list(best_strategy_duplicates))
-        print("Selected:",best_strategy_rand)
+        print("Selected:", best_strategy_rand)
 
         # Add "guessing" strategy
         best_strategy_guess = "guessing"
-        # TODO: Set best_alpha to the random strategy chosen...
-    else:
+    else:  # If most likely strategy found, add that to all columns
         best_strategy_guess = best_strategy
         best_strategy_rand = best_strategy
         best_strategy_duplicates = best_strategy
@@ -341,7 +336,12 @@ def optimizer(strategies, Spreadsheet, trial, pid):
           f'\n'f'Best strategy guess: {best_strategy_guess} '
           f'\n'f'Best alpha: {best_alpha[0]:.2f} '
           f'\n'f'Best neg log likelihood: {min_neg_log_likelihood:.2f}')
-    return best_strategy_rand, best_strategy_guess, best_strategy_duplicates, best_alpha, min_neg_log_likelihood, all_solutions
+    return best_strategy_rand, \
+           best_strategy_guess, \
+           best_strategy_duplicates, \
+           best_alpha, \
+           min_neg_log_likelihood, \
+           all_solutions
 
 
 def joint_likelihood(alpha, strategy, Spreadsheet, trial, pid):
@@ -361,7 +361,7 @@ def joint_likelihood(alpha, strategy, Spreadsheet, trial, pid):
     """
     stimuli_selected = part_data[(part_data['id'] == pid) &
                                  (part_data['trial'] == trial)
-                                ].iloc[0][['1', '2', '3', '4']].tolist()
+                                 ].iloc[0][['1', '2', '3', '4']].tolist()
 
     for stim in stimuli_selected:  # 4 bugs [21111, 21222, 12222, 2...]
         if strategy == 'strong':
@@ -407,12 +407,11 @@ def joint_likelihood(alpha, strategy, Spreadsheet, trial, pid):
         elif part_label != true_label:
             likelihood = (1 - alpha) * 0.5
 
-
         p *= likelihood
 
     # return negative log likelihood
     return - np.log(p)
 
+
 if __name__ == '__main__':
     main()
-
