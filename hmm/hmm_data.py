@@ -2,7 +2,7 @@ import ast
 
 import pandas as pd
 
-initial_data = pd.read_csv("../results/model_fit_results.csv")
+initial_data = pd.read_csv("../likelihood_model/likel_results/model_fit_results.csv")
 
 # How to deal with duplicates?
 
@@ -52,4 +52,4 @@ for method in methods:
         train_data.drop(train_data.columns[-1], axis=1, inplace=True)
 
     print(train_data)
-    train_data.to_csv(f"results/hmm_data_{method}.csv", index=False)
+    train_data.to_csv(f"likel_results/hmm_data_{method}.csv", index=False)

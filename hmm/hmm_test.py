@@ -21,12 +21,17 @@ print(sequence)
 print(sequence.shape)
 n_participants = len(sequence["strong"])
 n_participants = int(n_participants/10)
+
 # Sum of all strategies used per trial. Used to confirm the count matches in the hmm.fit algorithm
 trials = sequence.sum(axis=1)
 
+# Setting number of hidden states
+n_components = 3
+
+
 for q in range(100):
     print(q)
-    model = hmm.MultinomialHMM(n_components=3,
+    model = hmm.MultinomialHMM(n_components=n_components,
                                n_iter=1000,
                                params='tse',
                                init_params="tse",# Including letter ignores user parameter initialisation
@@ -50,7 +55,7 @@ for q in range(100):
 
     print(best_model.monitor_.history[-1])
 
-# save model results
+# save model likel_results
 np.savetxt("emission_probs.csv",best_model.emissionprob_)
 np.savetxt("start_prob.csv",best_model.startprob_)
 np.savetxt("trans_mat.csv",best_model.transmat_)
@@ -70,5 +75,5 @@ print(results)
 result_data = pd.DataFrame(sequence)
 result_data["State"] = results
 
-# Save results into the "results folder"
-result_data.to_csv("results/hmm_hidden_states.csv", index=False)
+# Save likel_results into the "likel_results folder"
+result_data.to_csv(f"hmm_results/hmm_result_states_{n_components}.csv", index=False)

@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-df = pd.read_csv("../results/model_fit_results.csv")
+df = pd.read_csv("../likelihood_model/likel_results/model_fit_results.csv")
 
 fig, ax = plt.subplots(1, 2, figsize=(16, 6))
 

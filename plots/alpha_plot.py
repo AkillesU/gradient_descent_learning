@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-df = pd.read_csv("../results/model_fit_results.csv")
+df = pd.read_csv("../likelihood_model/likel_results/model_fit_results.csv")
 
 grouped_means = df.groupby('trial').mean()
 grouped_stds = df.groupby('trial').std()

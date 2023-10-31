@@ -5,9 +5,9 @@ import pandas as pd
 from scipy import optimize
 
 # Read participant data
-part_data = pd.read_csv("data/cleaned_pilotdata.csv", delimiter=";")
+part_data = pd.read_csv("../data/cleaned_pilotdata.csv", delimiter=";")
 # Read code file
-code_file = pd.read_csv("data/fullcode.csv", delimiter=";")
+code_file = pd.read_csv("../data/fullcode.csv", delimiter=";")
 
 # Creating list of participant IDs. Order is maintained.
 part_ids = part_data['id'].drop_duplicates().tolist()
@@ -205,7 +205,7 @@ def map_participant_to_spreadsheet(pid):
 def main():
     n_trials = 11  # 10 (+1 for the range function)
     strategies = ['strong', 'weak1', 'weak2', 'prototype']
-    # Creating empty results dataframe
+    # Creating empty likel_results dataframe
     columns = ['id',
                'trial',
                'best_strategy_rand',
@@ -249,7 +249,7 @@ def main():
             print(best_strategy_rand_across_trials)
             print(best_strategy_guess_across_trials)
 
-            # Save results.
+            # Save likel_results.
             new_data = pd.DataFrame({
                 'id': [pid],
                 'trial': [trial],
@@ -267,11 +267,11 @@ def main():
                 'proto_alpha': all_solutions[3][0],
                 'proto_nlogl': all_solutions[3][1],
             })
-            # Concat new row to results dataframe
+            # Concat new row to likel_results dataframe
             results = pd.concat([results,new_data], ignore_index=True)
             print(results)
 
-    results.to_csv('results/model_fit_results.csv', index=False) #Comment this line to not save results
+    results.to_csv('likel_results/model_fit_results.csv', index=False) #Comment this line to not save likel_results
 
 def optimizer(strategies, Spreadsheet, trial, pid):
     best_strategy = ''
