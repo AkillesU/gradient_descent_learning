@@ -5,14 +5,14 @@ import numpy as np
 
 df = pd.read_csv("../likelihood_model/likel_results/model_fit_results.csv")
 
-n_participants = int(len(df)/10)
+n_participants = int(len(df)/10) # Set n_participants for versioning
 
 grouped_means = df.groupby('trial').mean()
 grouped_stds = df.groupby('trial').std()
 grouped_counts = df.groupby('trial').count()
-grouped_se = grouped_stds / np.sqrt(grouped_counts)
+grouped_se = grouped_stds / np.sqrt(grouped_counts) # Grouped Standard errors
 
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(10, 6)) # Initialise figure
 
 columns = ['strong_alpha', 'weak1_alpha', 'weak2_alpha', 'proto_alpha']
 
