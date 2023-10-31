@@ -2,7 +2,7 @@ import ast
 
 import pandas as pd
 
-initial_data = pd.read_csv("results/model_fit_results.csv")
+initial_data = pd.read_csv("../results/model_fit_results.csv")
 
 # How to deal with duplicates?
 

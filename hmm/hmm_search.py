@@ -2,7 +2,7 @@ from hmmlearn import hmm
 import matplotlib.pyplot as plt
 import pandas as pd
 
-sequence = pd.read_csv("results/hmm_data_best_strategies.csv")
+sequence = pd.read_csv("hmm_data/hmm_data_best_strategies.csv")
 
 print(sequence.shape)
 trials = sequence.sum(axis=1)

@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pickle
 
-with open("../results/best_model.pkl", "rb") as file:
+with open("../hmm/hmm_results/best_model.pkl", "rb") as file:
     model = pickle.load(file)
 
 n_states = model.n_states
