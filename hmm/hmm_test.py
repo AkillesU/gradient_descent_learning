@@ -37,18 +37,18 @@ for q in range(100):
                                init_params="tse",# Including letter ignores user parameter initialisation
                                n_trials=trials,
                                verbose=False,
-                               tol=0.001) #
+                               tol=0.001)
 
     # Set 5 features: Strong, Weak1, Weak2, Prototype, Guessing. NOTE: Has to be set to 4 with random method
     model.n_features = 4
     lengths = [10]*n_participants
     model.fit(sequence, lengths=lengths)
-    log_likelihood=model.monitor_.history[-1]
-    print(model.monitor_.history[-1])
-    if q==0:
+    log_likelihood=model.monitor_.history[-1] # Get negative log_likelihood
+    print(model.monitor_.history[-1]) # Print model negative log_likelihood
+    if q==0:  # Initialise best_log_likelihood
         best_ll=log_likelihood
         best_model=model
-    else:
+    else:  # Update best neg_log_likelihood if current neg_log_likelihood is higher
         if log_likelihood>best_ll:
             best_ll=log_likelihood
             best_model=model
@@ -67,12 +67,16 @@ print(f"Emission_probabilities: {np.around(best_model.emissionprob_,3)}\n",
 
 import pickle
 
+# Save model with versioning for n_states
 with open(f"hmm_results/best_model_states_{n_components}.pkl", "wb") as file:
     pickle.dump(best_model, file)
 
+# Predict hidden states for each trial using the best model
 results = best_model.predict(sequence, lengths=lengths)
 print(results)
 result_data = pd.DataFrame(sequence)
+
+# Add hidden states column to original sequence
 result_data["State"] = results
 
 # Save likel_results into the "likel_results folder"
