@@ -18,7 +18,7 @@ lengths = [10]*10 # Set lengths variable for "lengths" arg in model.fit
 bic = []  # Initialise list of BIC values
 aic = []  # Initialise list of AIC values
 lls = []  # Initialise list of log likelihood values
-ns = [2, 3, 4, 5, 6]  # Set list containing number of states
+ns = [2, 3, 4, 5, 6, 7, 8]  # Set list containing number of states
 
 # This function fits 100 randomly initialised MultinomialHMM models with the data and selects the best model.
 # The process is repeated for each n_states and the results (AIC,BIC,LogLikel) are saved and plotted.
