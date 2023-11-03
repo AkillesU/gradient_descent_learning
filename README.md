@@ -88,6 +88,8 @@ under `/hmm_data`:
 
 `hmm_plot.py`: Plots the HMM model parameters as a graph
 
+`prototype_plot.py`: Plots the proportion of participants selecting the "prototype bug" across trials
+
 ---
 
 ## Analysis Procedure
