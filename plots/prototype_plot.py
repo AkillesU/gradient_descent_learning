@@ -1,6 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
 
 """
 This script creates a plot showing what proportion of participants selected the 
