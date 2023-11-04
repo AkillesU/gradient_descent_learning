@@ -13,9 +13,13 @@ This directory contains the initial data and preprocessing pipeline.
 
 `datawrangle.py`: Collects all participant responses into a single csv file
 
+`exclusion.py`: Creates file of participant IDs to be excluded from experiment (see script comments)
+
 `fullcode.csv`: Code file for decoding randomisation
 
 `cleaned_pilotdata.csv`: output from `datawrangle.py`. Contains participant trials along with randomisation coding.
+
+`exclusions.csv`: output from `exclusion.py`. Contains excluded participant IDs
 
 `/pilotdata`: contains initial raw data from 10 participants.
 
