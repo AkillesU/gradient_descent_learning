@@ -79,5 +79,5 @@ result_data = pd.DataFrame(sequence)
 # Add hidden states column to original sequence
 result_data["State"] = results
 
-# Save likel_results into the "likel_results folder"
+# Save hmm_results into the "hmm_results"
 result_data.to_csv(f"hmm_results/hmm_result_states_{n_components}_part{n_participants}.csv", index=False)
