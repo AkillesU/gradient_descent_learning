@@ -2,7 +2,7 @@ from hmmlearn import hmm
 import matplotlib.pyplot as plt
 import pandas as pd
 
-data_path = "hmm_data_best_strategies.csv"
+data_path = "hmm_data_best_strategies_part8.csv"
 sequence = pd.read_csv(f"hmm_data/{data_path}")
 
 file_num = {
@@ -13,7 +13,7 @@ file_num = {
 
 print(sequence.shape)
 trials = sequence.sum(axis=1) # Set trials variable for "n_trials" arg in MultinomialHMM
-lengths = [10]*10 # Set lengths variable for "lengths" arg in model.fit
+lengths = [10]*int(len(sequence)/10) # Set lengths variable for "lengths" arg in model.fit
 
 bic = []  # Initialise list of BIC values
 aic = []  # Initialise list of AIC values
