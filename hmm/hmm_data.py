@@ -3,6 +3,11 @@ import pandas as pd
 
 initial_data = pd.read_csv("../likelihood_model/likel_results/model_fit_results.csv")
 
+df_exclude = pd.read_csv("../data/exclusions.csv")
+
+# Exclude participants
+initial_data = initial_data[~initial_data['id'].isin(df_exclude['id'])].reset_index()
+
 # Creating list of methods to deal with equally likely strategies
 methods = ["best_strategies", "best_strategy_rand", "best_strategy_guess" ]
 
@@ -53,4 +58,4 @@ for method in methods:
         train_data.drop(train_data.columns[-1], axis=1, inplace=True)
 
     print(train_data)
-    train_data.to_csv(f"likel_results/hmm_data_{method}.csv", index=False)
+    train_data.to_csv(f"hmm_data/hmm_data_{method}_part{int(len(initial_data)/10)}.csv", index=False)
