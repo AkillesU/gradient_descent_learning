@@ -5,6 +5,11 @@ import numpy as np
 
 df = pd.read_csv("../likelihood_model/likel_results/model_fit_results.csv")
 
+df_exclude = pd.read_csv("../data/exclusions.csv")
+
+# Exclude participants
+df = df[~df['id'].isin(df_exclude['id'])]
+
 n_participants = int(len(df)/10) # Set n_participants for versioning
 
 grouped_means = df.groupby('trial').mean()
