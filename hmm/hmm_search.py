@@ -5,11 +5,13 @@ import pandas as pd
 data_path = "hmm_data_best_strategies_part8.csv"
 sequence = pd.read_csv(f"hmm_data/{data_path}")
 
-file_num = {
-"hmm_data_best_strategies.csv": 1,
-"hmm_data_best_strategy_guess.csv": 2,
-"hmm_data_best_strategy_rand.csv": 3
-}
+def file_num(input_string):
+    if "strategies" in input_string:
+        return 1
+    elif "guess" in input_string:
+        return 2
+    elif "rand" in input_string:
+        return 3
 
 print(sequence.shape)
 trials = sequence.sum(axis=1) # Set trials variable for "n_trials" arg in MultinomialHMM
@@ -58,7 +60,7 @@ def select_best_model(X):
     ax.set_xlabel("Number of HMM Components")
     fig.tight_layout()
 
-    plt.savefig(f"hmm_results/hmm_search_part{int(len(trials) / 10)}_{file_num[data_path]}")
+    plt.savefig(f"hmm_results/hmm_search_part{int(len(trials) / 10)}_{file_num(data_path)}")
     plt.show()
 
 
