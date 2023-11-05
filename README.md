@@ -98,6 +98,17 @@ under `/hmm_data`:
 
 ## Analysis Procedure
 
-**TODO**
+1. **Initial Data Setup** Run `/data/datawrangle.py`. This creates a single dataframe from all participant data with columns for ID, trial number, choices for given trial (1-4), randomisation spreadsheet, and the bug_id the test trial was asking to identify. **Output**: `/data/cleaned_pilotdata.csv`
+2. **Maximum Likelihood Model fit** Run `/likelihood_model/model_fitting.py`. This runs the maximum likelihood model which calculates the most likely strategy a participant was using, based on their selections for a given trial. **Output**: `/likelihood_model/likel_results/model_fit_results.csv`
+3. **Participant Exclusion** Run `/data/exclusion.py` to exclude participants. Participants are excluded based on two criteria:
+  
+   1. Not selecting the prototype (most predictive) bug on the final test trial.
+   2. If the maximum likelihood model suggested the participant was guessing on the final test trial (alpha = 0).
+
+      **Output**: `/data/exclusions.csv` (list of excluded participant IDs)
+4. **HMM Data Setup** Run `/hmm/hmm_data.py`. This generates an input file for the HMM from the maximum likelihood model output. **Output**: `/hmm/hmm_data/hmm_best_(...).csv` (filename depends on the number of participants and method for dealing with equally likely strategies for a trial)
+5. **HMM Model Search** Run `/hmm/hmm_search.py`. This plots the BIC and AIC values across different number of hidden states. Use the lowest BIC value to select the best number of states. **Output**: `/hmm/hmm_results/hmm_search_(...).png` (filename depends on number on the number of participants and method for dealing with equally likely strategies for a trial)
+6. **HMM Model Fit** Run `/hmm/hmm_test.py`. This fits a HMM with a specified number of states to a `/hmm/hmm_data/...` file. The best model is then used to predict states for the same input data. **Output**: `/hmm/hmm_results/best_model_(...).pkl` and `/hmm/hmm_results/hmm_result_(...).csv`
+7.  **Plot Results** Run `/plots/alpha_plot.py`, `/plots/strategy_plot.py`, `/plots/prototype_plot.py`, and `/plots/hmm_plot.py`. **Output**: `/plots/images/...`
 
 
