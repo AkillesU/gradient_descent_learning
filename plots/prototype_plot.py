@@ -11,6 +11,12 @@ with all features predicting the queried bug category.
 part_data = pd.read_csv("../data/cleaned_pilotdata.csv", delimiter=";")
 # Read code file
 code_file = pd.read_csv("../data/fullcode.csv", delimiter=";")
+
+df_exclude = pd.read_csv("../data/exclusions.csv")
+
+# Exclude participants
+part_data = part_data[~part_data['id'].isin(df_exclude['id'])].reset_index()
+
 n_participants = int(len(part_data) / 10)
 
 
