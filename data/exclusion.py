@@ -9,7 +9,7 @@ This script creates a list of participant IDs to be excluded based on two criter
 
 
 # Read participant data
-part_data = pd.read_csv("cleaned_pilotdata.csv", delimiter=";")
+part_data = pd.read_csv("cleaned_pilotdata.csv", delimiter=",")
 # Read code file
 code_file = pd.read_csv("fullcode.csv", delimiter=";")
 
