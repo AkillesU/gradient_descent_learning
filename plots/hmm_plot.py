@@ -123,5 +123,5 @@ for i, emissions in enumerate(emission_probabilities):
 ax.set_title(f'Hidden Markov Model Visualization ({n_states} states)')
 plt.axis('off')  # Turn off the axis
 
-plt.savefig(f"images/hmm_graph_s{n_states}_part{n_participants}.png")
+plt.savefig(f"images/participants_{n_participants}/hmm_graph_s{n_states}_part{n_participants}.png")
 plt.show()

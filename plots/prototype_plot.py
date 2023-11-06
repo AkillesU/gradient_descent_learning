@@ -143,7 +143,7 @@ plt.xlabel('Trial')
 plt.ylabel('Prototype Accuracy')
 
 # Save figure
-plt.savefig(f"images/prototype_plot_part{n_participants}.png")
+plt.savefig(f"images/participants_{n_participants}/prototype_plot_part{n_participants}.png")
 
 # Show the plot
 plt.show()

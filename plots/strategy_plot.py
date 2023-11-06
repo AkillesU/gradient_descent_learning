@@ -101,5 +101,5 @@ ax[1, 1].grid(True, axis='y', linestyle='--', linewidth=0.5)
 
 
 plt.tight_layout()
-plt.savefig(f"images/strategy_plot_part{n_participants}")
+plt.savefig(f"images/participants_{n_participants}/strategy_plot_part{n_participants}")
 plt.show()
