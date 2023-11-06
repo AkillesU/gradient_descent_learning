@@ -5,7 +5,7 @@ import pandas as pd
 from scipy import optimize
 
 # Read participant data
-part_data = pd.read_csv("../data/cleaned_pilotdata.csv", delimiter=";")
+part_data = pd.read_csv("../data/cleaned_pilotdata.csv", delimiter=",")
 # Read code file
 code_file = pd.read_csv("../data/fullcode.csv", delimiter=";")
 
