@@ -36,13 +36,15 @@ df['parsed_strategies'] = df['best_strategies'].apply(parse_strategies)
 # Count occurrences
 strategy_counts_per_trial = pd.DataFrame(index=np.arange(1, 11), columns=["strong", "weak1", "weak2", "prototype"]).fillna(0)
 
-# Iterate through the DataFrame and count occurrences
+# Iterate through the DataFrame and count occurrences. If ties, the sum of counts is 1
+# E.g., if there are 3 equally likely strategies per trial each gets a count of 0.333
 for index, row in df.iterrows():
     trial = row['trial']
     strategies = row['parsed_strategies']
+    increment_value = 1 / len(strategies)  # Each strategy gets an equal share of 1
     for strategy in strategies:
         if strategy in strategy_counts_per_trial.columns:
-            strategy_counts_per_trial.loc[trial, strategy] += 1
+            strategy_counts_per_trial.loc[trial, strategy] += increment_value
 
 
 fig, ax = plt.subplots(2, 2, figsize=(16, 14)) # Initialise figure
