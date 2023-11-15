@@ -19,7 +19,7 @@ grouped_se = grouped_stds / np.sqrt(grouped_counts) # Grouped Standard errors
 
 plt.figure(figsize=(10, 6)) # Initialise figure
 
-columns = ['strong_alpha', 'weak1_alpha', 'weak2_alpha', 'proto_alpha']
+columns = ['strong_alpha', 'weak1_alpha', 'weak2_alpha', 'proto_alpha', 'best_alpha']
 
 for column in columns:
     plt.plot(grouped_means.index, grouped_means[column], label=column)
@@ -31,7 +31,8 @@ for column in columns:
 plt.title('Mean Alpha Across Trials (Shade = SE)')
 plt.xlabel('Trial')
 plt.ylabel('Value')
-plt.legend()
+legend = plt.legend()
+legend.get_texts()[4].set_text("Best strategy alpha")
 plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 plt.tight_layout()
 plt.savefig(f"images/participants_{n_participants}/alpha_plot_part{n_participants}")
