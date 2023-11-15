@@ -2,7 +2,7 @@ from hmmlearn import hmm
 import matplotlib.pyplot as plt
 import pandas as pd
 
-data_path = "hmm_data_best_strategies_part8.csv"
+data_path = "hmm_data_best_strategies_part25.csv"
 sequence = pd.read_csv(f"hmm_data/{data_path}")
 
 def file_num(input_string):
