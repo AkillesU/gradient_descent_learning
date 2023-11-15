@@ -59,14 +59,10 @@ for i, prob in enumerate(starting_probabilities):
     nx.draw_networkx_nodes(G, pos, nodelist=[i], node_size=3000, node_color=[colors[i]], ax=ax)
 
 
-# Draw the graph
-nx.draw(G, pos, ax=ax, with_labels=False, node_size=3000, node_color=colors, font_weight='bold', arrowsize=20)
-
 # Draw starting probabilities inside nodes
 for i, prob in enumerate(starting_probabilities):
-    plt.text(*pos[i], f'{prob:.2f}', fontsize=12, ha='center', va='center')
+   plt.text(*pos[i], f'{prob:.2f}', fontsize=12, ha='center', va='center')
 
-# Function to calculate label offset
 # Function to calculate label offset
 def edge_label_offset(source_pos, target_pos, xoffset=0.1, yoffset=0.1):
     # Adjust the offset based on the position of the source and target
@@ -100,7 +96,7 @@ def calculate_offset(source_pos, target_pos, xoffset=0.1, yoffset=0.1):
     return label_x, label_y
 
 # Draw edges
-nx.draw_networkx_edges(G, pos, edge_color='black', ax=ax)
+nx.draw_networkx_edges(G, pos, edge_color='black', ax=ax, arrowsize=20, node_size=3000)
 
 # Add edge labels with source node color
 for i, j, data in G.edges(data=True):
