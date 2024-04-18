@@ -62,13 +62,18 @@ for file in all_files:
 master_df = master_df.sort_values(by=["id", "trial"], ascending=[True, True], ignore_index=True)
 print(master_df)
 
+"""
+Got complain from participant that they had to redo experiment from trial 5.
+Check trial counts for each participant
+"""
 # Check number of trials per participant
 trials_count = master_df.groupby('id').size()
-
 # Sort the counts in descending order to have the 'id' with the most trials at the top
 print(trials_count.sort_values(ascending=False))
 
-
+# For this run it seems like 10937464.0 got 17 trials somehow. Will delete participant
+master_df = master_df[master_df["id"] != 10937464.0]
+print(master_df)
 
 
 master_df.to_csv('cleaned_data.csv', index=False)
