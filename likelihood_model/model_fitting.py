@@ -5,7 +5,7 @@ import pandas as pd
 from scipy import optimize
 
 # Read participant data
-part_data = pd.read_csv("../data/cleaned_pilotdata.csv", delimiter=",")
+part_data = pd.read_csv("../data/cleaned_data.csv", delimiter=",")
 # Read code file
 code_file = pd.read_csv("../data/fullcode.csv", delimiter=";")
 
@@ -310,6 +310,9 @@ def optimizer(strategies, Spreadsheet, trial, pid):
                 print("Too many best strategies in 'best_strategy_duplicates'")
 
         if res.fun < min_neg_log_likelihood:
+            # Empty best strategy_duplicates
+            best_strategy_duplicates = []
+
             best_strategy = strategy  # Updating best strategy
             best_alpha = res.x  # Updating best_alpha
             min_neg_log_likelihood = res.fun  # Updating best log_likelihood
