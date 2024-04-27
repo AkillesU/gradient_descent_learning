@@ -8,7 +8,7 @@ with all features predicting the queried bug category.
 """
 
 # Read participant data
-part_data = pd.read_csv("../data/cleaned_pilotdata.csv", delimiter=",")
+part_data = pd.read_csv("../data/cleaned_data.csv", delimiter=",")
 # Read code file
 code_file = pd.read_csv("../data/fullcode.csv", delimiter=";")
 

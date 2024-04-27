@@ -2,7 +2,7 @@ from hmmlearn import hmm
 import matplotlib.pyplot as plt
 import pandas as pd
 
-data_path = "hmm_data_best_strategies_part25.csv"
+data_path = "hmm_data_best_strategies_part156.csv"
 sequence = pd.read_csv(f"hmm_data/{data_path}")
 
 def file_num(input_string):
@@ -36,7 +36,11 @@ def select_best_model(X):
             model = hmm.MultinomialHMM(n_components=n_states,
                                        n_iter=1000,
                                        n_trials=trials)
-            model.n_features = 4  # Set number of features. (Should be 5 if using best_strategy_guess)
+            # Set number of features. (Should be 5 if using best_strategy_guess)
+            if "guess" in data_path:
+                model.n_features = 5
+            else:
+                model.n_features = 4
             model.fit(X, lengths=lengths)
 
             score = model.score(X)  # Get log likelihood for model fit

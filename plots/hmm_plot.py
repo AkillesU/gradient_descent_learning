@@ -5,12 +5,12 @@ import pickle
 import numpy as np
 
 
-"""
+""")
 This code creates a HMM graph. 
 Colors denote nodes and transition probabilities FROM that node.
 """
 # Load a model
-with open("../hmm/hmm_results/best_model_states_2_part25.pkl", "rb") as file:
+with open("../hmm/hmm_results/best_model_states_2_part156.pkl", "rb") as file:
     model = pickle.load(file)
 
 # Set variables with trained model properties
@@ -35,8 +35,8 @@ G = nx.DiGraph()
 # Add edges to the graph based on the transition probabilities matrix
 for i in range(n_states):
     for j in range(n_states):
-        # Add an edge only if the transition probability is greater than a threshold, for instance, 0
-        if transition_probabilities[i][j] > 0:
+        # Add an edge only if the transition probability is greater than a threshold, for instance, 0.001
+        if transition_probabilities[i][j] > 0.001:
             G.add_edge(i, j, weight=transition_probabilities[i][j])
 
 # Function to determine position for edge labels to be on the right side of the transition
@@ -51,7 +51,10 @@ def get_label_pos(source, target, pos, offset=0.1):
     return pos[source][0] + dx/2 + perp_dx*offset, pos[source][1] + dy/2 + perp_dy*offset
 
 # Draw graph
-pos = nx.circular_layout(G)  # Set graph shape
+if n_states > 2:
+    pos = nx.circular_layout(G)  # Set graph shape
+else:
+    pos = nx.spring_layout(G)
 fig, ax = plt.subplots(figsize=(10, 8))  # Initialise figure
 
 # Draw the graph with node-specific colors
@@ -94,6 +97,7 @@ def calculate_offset(source_pos, target_pos, xoffset=0.1, yoffset=0.1):
     label_y = mid_y + x_offset  # Notice that we use x_offset for y coordinate
 
     return label_x, label_y
+
 
 # Draw edges
 nx.draw_networkx_edges(G, pos, edge_color='black', ax=ax, arrowsize=20, node_size=3000)
