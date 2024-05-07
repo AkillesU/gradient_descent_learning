@@ -31,7 +31,7 @@ def use_strong(Spreadsheet, stim):
             (code_file['Spreadsheet'] == Spreadsheet) &  # Match Spreadsheet
             (code_file['feature_type'] == 'strong') &  # Match feature_type
             (code_file['dim_value'] == 2)  # Match dim_value
-            ]['bug_id'].iloc[0]  # Get bug_id for dim_value == 1
+            ]['bug_id'].iloc[0]  # Get bug_id for dim_value == 2
     }
 
     strong_dimension = code_file[
