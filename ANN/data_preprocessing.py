@@ -3,12 +3,13 @@ import pandas as pd
 import ast
 
 
+# Process the study test trials
 def process_test_df(df):
-    # Filter for rows where "Display" is "test"
+    # Filter for rows where "Display" column is "test"
     df_test = df[df["Display"] == "test"].copy()
     # Filter for test rows where the participant reacted with the continue button
     df_test = df_test[df["Object Name"] == "Continue Button"]
-    # Filter out responses where the reaction didn't advance the screen
+    # Filter out responses where the reaction didn"t advance the screen
     df_test = df_test[df["Response"] != "(Continue)"]
     # Find the occurrence for each "Trial Number" from 1-10
     relevant_rows = []
@@ -21,17 +22,18 @@ def process_test_df(df):
     # Initialize an empty list to collect rows for the new DataFrame
     new_rows = []
 
+    # Process each row
     for idx, row in df_filtered.iterrows():
-        participant_id = row['Participant Private ID']
-        trial_num = row['Trial Number']
-        spreadsheet = row['Spreadsheet']
-        bug_id = int(row['Spreadsheet: bug_id']) -1 # labels as 0 and 1 instead of 1 and 2
+        participant_id = row["Participant Private ID"]
+        trial_num = row["Trial Number"]
+        spreadsheet = row["Spreadsheet"]
+        bug_id = int(row["Spreadsheet: bug_id"]) -1 # labels as 0 and 1 instead of 1 and 2
 
         # Convert the string representation of list to actual list
-        file_list = ast.literal_eval(row['Response'])
+        file_list = ast.literal_eval(row["Response"])
 
-        # Extract the number sequences from each filename
-        number_sequences = [file.split('.')[0] for file in file_list]
+        # Extract the number sequences from each filename (e.g., "21221.jpg")
+        number_sequences = [file.split(".")[0] for file in file_list]
 
         # Pad the list with None values if it has less than 4 entries
         number_sequences += [None] * (4 - len(number_sequences))
@@ -42,10 +44,11 @@ def process_test_df(df):
         new_rows.append(new_row)
 
     # Create a new DataFrame from the collected rows
-    new_df = pd.DataFrame(new_rows, columns=['id', 'block', '1', '2', '3', '4', 'Spreadsheet', 'label'])
+    new_df = pd.DataFrame(new_rows, columns=["id", "block", "1", "2", "3", "4", "Spreadsheet", "label"])
     return new_df
 
 
+# Process training data
 def process_train_df(df):
     # Filter to contain only training trials
     df_train = df[df["Display"] == "bug_images"]
@@ -75,37 +78,43 @@ def process_train_df(df):
     return df_final
 
 
-folder_path = 'data/experiment_data'
-all_files = [os.path.join(folder_path, file) for file in os.listdir(folder_path) if file.endswith('.csv')]
+def main():
+    # Folder path for all participant data
+    folder_path = "data/experiment_data"
+    # Get all file paths
+    all_files = [os.path.join(folder_path, file) for file in os.listdir(folder_path) if file.endswith(".csv")]
 
-test_df = pd.DataFrame()
-for file in all_files:
-    print(file)
-    df = pd.read_csv(file)
-    processed_df = process_test_df(df)
-    test_df = pd.concat([test_df, processed_df], ignore_index=True)
+    # initialise empty dataframe
+    test_df = pd.DataFrame()
+    # Process each file for test data
+    for file in all_files:
+        print(file)
+        df = pd.read_csv(file)
+        processed_df = process_test_df(df)
+        test_df = pd.concat([test_df, processed_df], ignore_index=True)
 
-
-train_df = pd.DataFrame()
-for file in all_files:
-    print(file)
-    df = pd.read_csv(file)
-    processed_df = process_train_df(df)
-    train_df = pd.concat([train_df, processed_df], ignore_index=True)
-
-
-# Order based on id and trial
-test_df = test_df.sort_values(by=["id", "block"], ascending=[True, True], ignore_index=True)
-print(test_df)
-
-# For this run it seems like 10937464.0 got 17 trials somehow. Will delete participant
-test_df = test_df[test_df["id"] != 10937464.0]
-print(test_df)
-
-# For this run it seems like 10937464.0 got 17 trials somehow. Will delete participant
-train_df = train_df[train_df["id"] != 10937464.0]
-print(train_df)
+    # Initialise empty dataframe
+    train_df = pd.DataFrame()
+    # Process each file for training data
+    for file in all_files:
+        print(file)
+        df = pd.read_csv(file)
+        processed_df = process_train_df(df)
+        train_df = pd.concat([train_df, processed_df], ignore_index=True)
 
 
-train_df.to_csv("data/train_data.csv", index=False)
-test_df.to_csv("data/test_data.csv", index=False)
+    # Order based on id and trial
+    test_df = test_df.sort_values(by=["id", "block"], ascending=[True, True], ignore_index=True)
+    print(test_df)
+
+    # For this experiment run it seems like 10937464.0 got 17 trials somehow. Will delete participant
+    test_df = test_df[test_df["id"] != 10937464.0]
+    print(test_df)
+
+    # Save training and test data to csv
+    train_df.to_csv("data/train_data.csv", index=False)
+    test_df.to_csv("data/test_data.csv", index=False)
+
+
+if __name__ == "__main__":
+    main()

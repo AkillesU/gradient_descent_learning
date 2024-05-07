@@ -37,7 +37,7 @@ Repeat process for all participants
 
 
 """
-Let's define it such that the first feature is the strong one, second is weak1, third is weak2
+Let"s define it such that the first feature is the strong one, second is weak1, third is weak2
 
 strong, weak1, weak2
 
@@ -50,22 +50,22 @@ This setup will be kept across participants to ease interpretation.
 def strong_code(Spreadsheet, bug, code_file):
     # Dictionary for getting bug_id for each dim_value (1,2)
     dim_val_to_bug_id = {
-        '1': code_file[
-            (code_file['Spreadsheet'] == Spreadsheet) &  # Match Spreadsheet
-            (code_file['feature_type'] == 'strong') &  # Match feature_type
-            (code_file['dim_value'] == 1)  # Match dim_value
-            ]['bug_id'].iloc[0],  # Get bug_id for dim_value == 1
-        '2': code_file[
-            (code_file['Spreadsheet'] == Spreadsheet) &  # Match Spreadsheet
-            (code_file['feature_type'] == 'strong') &  # Match feature_type
-            (code_file['dim_value'] == 2)  # Match dim_value
-            ]['bug_id'].iloc[0]  # Get bug_id for dim_value == 2
+        "1": code_file[
+            (code_file["Spreadsheet"] == Spreadsheet) &  # Match Spreadsheet
+            (code_file["feature_type"] == "strong") &  # Match feature_type
+            (code_file["dim_value"] == 1)  # Match dim_value
+            ]["bug_id"].iloc[0],  # Get bug_id for dim_value == 1
+        "2": code_file[
+            (code_file["Spreadsheet"] == Spreadsheet) &  # Match Spreadsheet
+            (code_file["feature_type"] == "strong") &  # Match feature_type
+            (code_file["dim_value"] == 2)  # Match dim_value
+            ]["bug_id"].iloc[0]  # Get bug_id for dim_value == 2
     }
 
     strong_dimension = code_file[
-                           (code_file['Spreadsheet'] == Spreadsheet) &  # Match Spreadsheet
-                           (code_file['feature_type'] == 'strong')  # Match feature_type == 'strong'
-                           ]['dimension'].iloc[0] - 1  # Get dimension (- 1 to get indexer)
+                           (code_file["Spreadsheet"] == Spreadsheet) &  # Match Spreadsheet
+                           (code_file["feature_type"] == "strong")  # Match feature_type == "strong"
+                           ]["dimension"].iloc[0] - 1  # Get dimension (- 1 to get indexer)
 
     # ensure bug is string
     bug = str(bug)
@@ -81,26 +81,26 @@ def strong_code(Spreadsheet, bug, code_file):
 
 # Function to check which label does the weak1 feature correspond to
 def weak1_code(Spreadsheet, bug, code_file):
-    # Filter the code_file to contain only rows with Spreadsheet and 'weak' features
+    # Filter the code_file to contain only rows with Spreadsheet and "weak" features
     filtered_data = code_file[
-        (code_file['Spreadsheet'] == Spreadsheet) &  # Match Spreadsheet
-        (code_file['feature_type'] == 'weak')  # Match feature_type
+        (code_file["Spreadsheet"] == Spreadsheet) &  # Match Spreadsheet
+        (code_file["feature_type"] == "weak")  # Match feature_type
         ]
 
     # Weak1 is the weak feature with the SMALLER dimension (out of 1,3,4)
-    smallest_dimension = filtered_data['dimension'].min()
+    smallest_dimension = filtered_data["dimension"].min()
 
     # Dictionary for getting bug_id for each dim_value (1,2)
     dim_val_to_bug_id = {
-        '1': filtered_data[(
-                (filtered_data['dimension'] == smallest_dimension) &  # Select Weak features with lower dimension
-                (filtered_data['dim_value'] == 1))  # Match dim_value
-        ]['bug_id'].iloc[0],  # Get bug_id for dim_value == 1
+        "1": filtered_data[(
+                (filtered_data["dimension"] == smallest_dimension) &  # Select Weak features with lower dimension
+                (filtered_data["dim_value"] == 1))  # Match dim_value
+        ]["bug_id"].iloc[0],  # Get bug_id for dim_value == 1
 
-        '2': filtered_data[(
-                (filtered_data['dimension'] == smallest_dimension) &  # Select Weak features with lower dimension
-                (filtered_data['dim_value'] == 2))  # Match dim_value
-        ]['bug_id'].iloc[0]  # Get bug_id for dim_value == 2
+        "2": filtered_data[(
+                (filtered_data["dimension"] == smallest_dimension) &  # Select Weak features with lower dimension
+                (filtered_data["dim_value"] == 2))  # Match dim_value
+        ]["bug_id"].iloc[0]  # Get bug_id for dim_value == 2
     }
 
     # Setting weak1_dimension based on the smaller dimension (- 1 to get indexer)
@@ -119,26 +119,26 @@ def weak1_code(Spreadsheet, bug, code_file):
 
 # Function to check which label does the weak2 feature correspond to
 def weak2_code(Spreadsheet, bug, code_file):
-    # Filter the code_file to contain only rows with Spreadsheet and 'weak' features
+    # Filter the code_file to contain only rows with Spreadsheet and "weak" features
     filtered_data = code_file[
-        (code_file['Spreadsheet'] == Spreadsheet) &  # Match Spreadsheet
-        (code_file['feature_type'] == 'weak')  # Match feature_type
+        (code_file["Spreadsheet"] == Spreadsheet) &  # Match Spreadsheet
+        (code_file["feature_type"] == "weak")  # Match feature_type
         ]
 
     # Weak2 is the weak feature with the LARGER dimension (out of 1,3,4)
-    largest_dimension = filtered_data['dimension'].max()
+    largest_dimension = filtered_data["dimension"].max()
 
     # Dictionary for getting bug_id for each dim_value (1,2)
     dim_val_to_bug_id = {
-        '1': filtered_data[(
-                (filtered_data['dimension'] == largest_dimension) &  # Select Weak features with larger dimension
-                (filtered_data['dim_value'] == 1))  # Match dim_value
-        ]['bug_id'].iloc[0],  # Get bug_id for dim_value == 1
+        "1": filtered_data[(
+                (filtered_data["dimension"] == largest_dimension) &  # Select Weak features with larger dimension
+                (filtered_data["dim_value"] == 1))  # Match dim_value
+        ]["bug_id"].iloc[0],  # Get bug_id for dim_value == 1
 
-        '2': filtered_data[(
-                (filtered_data['dimension'] == largest_dimension) &  # Select Weak features with larger dimension
-                (filtered_data['dim_value'] == 2))  # Match dim_value
-        ]['bug_id'].iloc[0]  # Get bug_id for dim_value == 2
+        "2": filtered_data[(
+                (filtered_data["dimension"] == largest_dimension) &  # Select Weak features with larger dimension
+                (filtered_data["dim_value"] == 2))  # Match dim_value
+        ]["bug_id"].iloc[0]  # Get bug_id for dim_value == 2
     }
 
     # Setting weak2_dimension based on the larger dimension (- 1 to get indexer)
@@ -157,7 +157,7 @@ def weak2_code(Spreadsheet, bug, code_file):
 
 
 # Function to decode bug representation to standardised format (e.g., 21121 --> (1,0,0))
-# The feature values correspond to the bug label they're most predictive of: 1 --> 1, 0 --> 0
+# The feature values correspond to the bug label they"re most predictive of: 1 --> 1, 0 --> 0
 # Prototype item for label == 0 would be (0,0,0) and correspondingly for label == 1 (1,1,1)
 def decode_features(Spreadsheet, bug, code_file):
 
@@ -187,7 +187,7 @@ def create_model(learning_rate=0.01):
     optimizer = keras.optimizers.SGD(learning_rate=learning_rate, momentum=0.0)
 
     # Compile the model
-    model.compile(optimizer=optimizer, loss='mean_squared_error')
+    model.compile(optimizer=optimizer, loss="mean_squared_error")
 
     return model
 
@@ -219,7 +219,7 @@ def softmax(scores_dict, temperature, test_label):
 def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_label, targets, model, permutations,
               callback, weights, list_manager):
     start_time = time.time()
-    if method == 'Nelder-Mead':
+    if method == "Nelder-Mead":
         res = optimize.minimize(
             objective_function,
             np.array([initial_lr, initial_temp]),
@@ -228,7 +228,7 @@ def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_
             options={"maxiter": 100},
             bounds=[(0.001, 5.0), (0.01, 10)]
         )
-    elif method == 'SLSQP':
+    elif method == "SLSQP":
         res = optimize.minimize(
             objective_function,
             np.array([initial_lr, initial_temp]),
@@ -238,13 +238,13 @@ def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_
             bounds=[(0.001, 5.0), (0.01, 10)]
         )
 
-    elif method == 'Differential Evolution':
+    elif method == "Differential Evolution":
         bounds = [(0.001, 5.0), (0.01, 10)]
         res = differential_evolution(
             objective_function,
             bounds,
             args=(train_input, train_labels, targets, test_label, model, permutations, method, weights, list_manager),
-            strategy='rand1bin',
+            strategy="rand1bin",
             maxiter=200,
             popsize=20,
             tol=0.01,
@@ -254,9 +254,9 @@ def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_
             callback=None,
             disp=False,
             polish=True,
-            init='latinhypercube'
+            init="latinhypercube"
         )
-    elif method == 'Basin-hopping':
+    elif method == "Basin-hopping":
         res = optimize.basinhopping(
             objective_function,
             np.array([initial_lr, initial_temp]),
@@ -264,9 +264,9 @@ def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_
             T=1.0,
             stepsize=0.5,
             minimizer_kwargs={
-                'method': 'L-BFGS-B',
-                'args': (train_input, train_labels, targets, test_label, model, permutations, method, weights),
-                'bounds': [(0.001, 5.0), (0.01, 10)]
+                "method": "L-BFGS-B",
+                "args": (train_input, train_labels, targets, test_label, model, permutations, method, weights),
+                "bounds": [(0.001, 5.0), (0.01, 10)]
             }
         )
     # Get elapsed time for optimisation process
@@ -277,7 +277,7 @@ def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_
     best_nlgl = res.fun
 
     # Train model with best settings and callback activated to save weights on each batch (item)
-    # Update the learning rate of the model's existing optimizer
+    # Update the learning rate of the model"s existing optimizer
     tf.keras.backend.set_value(model.optimizer.learning_rate, best_lr)
     model.set_weights(weights)
     # Train model
@@ -314,13 +314,13 @@ class WeightSaveCallback(tf.keras.callbacks.Callback):
         weights = self.model.get_weights()
         # Create a single row DataFrame from weights
         weights_row = {
-            'Strong': weights[0][0][0], # First weight
-            'Weak1': weights[0][1][0], # Second weight
-            'Weak2': weights[0][2][0], # Third weight
-            'Bias': weights[1][0], # Bias
-            'Participant_ID': self.participant_id,
-            'Block': self.block_num,
-            'Batch': batch
+            "Strong": weights[0][0][0], # First weight
+            "Weak1": weights[0][1][0], # Second weight
+            "Weak2": weights[0][2][0], # Third weight
+            "Bias": weights[1][0], # Bias
+            "Participant_ID": self.participant_id,
+            "Block": self.block_num,
+            "Batch": batch
         }
         # Append the row dictionary to the weights_data list
         self.weights_data.append(weights_row)
@@ -375,7 +375,7 @@ def objective_function(params, train_input, train_labels, targets, test_label, m
     # Get learning rate and temperature
     learning_rate, temperature = params
 
-    # Update the learning rate of the model's existing optimizer
+    # Update the learning rate of the model"s existing optimizer
     tf.keras.backend.set_value(model.optimizer.learning_rate, learning_rate)
     # Set model weights to the end of the previous block
     model.set_weights(weights)
@@ -431,9 +431,9 @@ def main():
     # Exclude participants
     exclude_ids = pd.read_csv("../data/exclusions.csv")
 
-    # Check Rows where id doesn't match with exlusion
-    test_mask = ~test_data['id'].isin(exclude_ids['id'])
-    train_mask = ~train_data['id'].isin(exclude_ids['id'])
+    # Check Rows where id doesn"t match with exlusion
+    test_mask = ~test_data["id"].isin(exclude_ids["id"])
+    train_mask = ~train_data["id"].isin(exclude_ids["id"])
 
     # Keep only rows where participant was not excluded
     test_data = test_data[test_mask]
@@ -451,7 +451,7 @@ def main():
     # If not
     if not os.path.exists(train_data_modified_path):
         # Change train_data to decoded format [strong, weak1, weak2]
-        train_data['input'] = train_data.progress_apply(lambda row: decode_features(row['Spreadsheet'], row['input'], code_file), axis=1)
+        train_data["input"] = train_data.progress_apply(lambda row: decode_features(row["Spreadsheet"], row["input"], code_file), axis=1)
         # Save results to csv
         train_data.to_csv(train_data_modified_path, index=False)
     # If yes
@@ -459,7 +459,7 @@ def main():
         # Read standardised train data file
         train_data = pd.read_csv(train_data_modified_path)
         # Make string representations of tuples back into tuples
-        train_data['input'] = train_data['input'].apply(ast.literal_eval)
+        train_data["input"] = train_data["input"].apply(ast.literal_eval)
 
     # Create list of columns to decode
     test_cols = ["1", "2", "3", "4"]
@@ -484,11 +484,11 @@ def main():
 
 
     # Create new column "targets" with a list of participant selections for each block
-    test_data['targets'] = test_data.apply(lambda row: [row['1'], row['2'], row['3'], row['4']], axis=1)
+    test_data["targets"] = test_data.apply(lambda row: [row["1"], row["2"], row["3"], row["4"]], axis=1)
 
 
     # Get participant IDs in a list
-    part_ids = train_data['id'].drop_duplicates().tolist()
+    part_ids = train_data["id"].drop_duplicates().tolist()
 
     # Define all bug permutations for forward pass and softmax
     permutations = np.array([
@@ -514,8 +514,8 @@ def main():
         id_train_data = train_data[train_data["id"] == id]
 
         # Group by block and collect all inputs
-        grouped_input = id_train_data.groupby('block')['input'].apply(list).tolist()
-        grouped_label = id_train_data.groupby('block')['label'].apply(list).tolist()
+        grouped_input = id_train_data.groupby("block")["input"].apply(list).tolist()
+        grouped_label = id_train_data.groupby("block")["label"].apply(list).tolist()
 
         # Convert the list of lists (for each block) into a numpy array
         input_array = [np.array(block) for block in grouped_input]
@@ -547,7 +547,7 @@ def main():
             # Initialise ListManager class for handling list of choice probabilities between functions
             list_manager = ListManager()
 
-            # E.g., Nelder-Mead seems to go for 0 learning rate after a few blocks so let's try randomly initialising
+            # E.g., Nelder-Mead seems to go for 0 learning rate after a few blocks so let"s try randomly initialising
             # learning rate for each block. Same for temperature
             learning_rate = random.uniform(0.001, 3.0)
             temperature = random.uniform(0.01, 10)
@@ -555,7 +555,7 @@ def main():
             # Define method/methods to be used in optimising objective function. Results are stored for the last
             # method in the list. Including multiple methods is mainly for comparing compute times and effectiveness
             # across methods.
-            methods = ['Differential Evolution'] # 'Nelder-Mead' quicker but less reliable
+            methods = ["Differential Evolution"] # "Nelder-Mead" quicker but less reliable
 
             # Define empty list for storing optimisation results
             results = []
@@ -588,8 +588,8 @@ def main():
 
             # Define data row for the current participant and block
             new_data = pd.DataFrame({
-                'id': id,
-                'block': block,
+                "id": id,
+                "block": block,
                 "neg_logl": best_nlgl,
                 "learning_rate": best_lr,
                 "temperature": best_temp,
@@ -614,5 +614,5 @@ def main():
         data_df.to_csv("data/model_fit.csv")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
