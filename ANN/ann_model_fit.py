@@ -8,10 +8,13 @@ from tqdm import tqdm
 from scipy import optimize
 import os
 import ast
-from scipy.optimize import differential_evolution
+from scipy.optimize import differential_evolution, dual_annealing
 import random
 import time
-
+import gc
+import pyswarms as ps
+from pyswarms.utils.functions import single_obj as fx
+import matplotlib.pyplot as plt
 tqdm.pandas()  # This enables `progress_apply` functionality
 
 """
@@ -213,11 +216,18 @@ def softmax(scores_dict, temperature, test_label):
     return softmax_dict
 
 
+losses = []
+
+
 # This function minimises the objective function (neg log likel) with a specified method.
 # It then saves the best values and reruns the best model setup to get weights for each batch and saves these to
 # a csv.
 def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_label, targets, model, permutations,
               callback, weights, list_manager):
+    def loss_callback(xk, convergence=None):
+        current_loss = objective_function(xk, train_input, train_labels, targets, test_label, model, permutations,
+                                          method, weights, list_manager)
+        losses.append(current_loss)  # Append the current loss
     start_time = time.time()
     if method == "Nelder-Mead":
         res = optimize.minimize(
@@ -239,22 +249,35 @@ def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_
         )
 
     elif method == "Differential Evolution":
-        bounds = [(0.001, 5.0), (0.01, 10)]
+        bounds = [(0.001, 10.0), (0.01, 50)]
         res = differential_evolution(
             objective_function,
             bounds,
             args=(train_input, train_labels, targets, test_label, model, permutations, method, weights, list_manager),
-            strategy="rand1bin",
-            maxiter=200,
-            popsize=20,
-            tol=0.01,
-            mutation=(0.5, 1.2),
-            recombination=0.7,
+            strategy="best1bin",
+            maxiter=100,
+            popsize=50,
+            tol=0.001,
+            mutation=(0.6, 1.99),
+            recombination=0.8,
             seed=None,
-            callback=None,
+            callback=loss_callback,
             disp=False,
             polish=True,
-            init="latinhypercube"
+            init="sobol"
+        )
+    elif method == "Dual Annealing":
+        bounds = [(0.001, 5.0), (0.01, 10)]
+        res = dual_annealing(
+            objective_function,
+            bounds,
+            args=(train_input, train_labels, targets, test_label, model, permutations, method, weights, list_manager),
+            no_local_search=False,
+            maxfun=1000,
+            maxiter=300,
+            #visit= 2.2,
+            #restart_temp_ratio= 0.01,
+            #accept= -100
         )
     elif method == "Basin-hopping":
         res = optimize.basinhopping(
@@ -269,6 +292,8 @@ def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_
                 "bounds": [(0.001, 5.0), (0.01, 10)]
             }
         )
+
+
     # Get elapsed time for optimisation process
     elapsed_time = time.time() - start_time
 
@@ -422,6 +447,16 @@ def objective_function(params, train_input, train_labels, targets, test_label, m
     return -total_log_likelihood
 
 
+def plot_loss_curve(losses):
+    plt.figure(figsize=(10, 5))
+    plt.plot(losses, marker='o', markersize=5, linestyle='-', color='b')
+    plt.title('Optimization Loss Curve')
+    plt.xlabel('Iteration')
+    plt.ylabel('Loss')
+    plt.grid(True)
+    plt.show()
+
+
 # Main function
 def main():
     # First we need to load in the participant data.
@@ -540,6 +575,8 @@ def main():
             labels = label_array[block]
             targets = target_array[block]
             test_label = test_labels[block]
+            global losses
+            losses = []
 
             # Set participant ID and block for weight save callback
             callback.set_participant_block(id, block)
@@ -579,7 +616,7 @@ def main():
                 # Append optimisation results to empty list
                 results.append((method, best_nlgl, best_lr, best_temp, comp_time))
             print(results)
-
+            #plot_loss_curve(losses)
             # Get best weights from model. Used to initialise models for next block.
             best_weights = best_model.get_weights()
 
@@ -609,6 +646,8 @@ def main():
             model = best_model
             print(data_df)
         print(data_df)
+
+        gc.collect()
 
         # Save model fit results to csv after each participant has been processed
         data_df.to_csv("data/model_fit.csv")
