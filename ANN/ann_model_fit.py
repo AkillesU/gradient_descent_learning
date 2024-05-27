@@ -200,7 +200,6 @@ def softmax(scores_dict, temperature, test_label):
     # Extract values and apply transformation if test_label is -1
     scores = np.array(list(scores_dict.values()))
 
-    scores = np.clip(scores, -36, 36)
     if test_label == -1:
         scores = - scores  # Invert scores if test_label is -1. This gives score for permutation being label == -1
 
@@ -250,7 +249,7 @@ def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_
         )
 
     elif method == "Differential Evolution":
-        bounds = [(0.001, 10.0), (0.01, 50)]
+        bounds = [(0.001, 2), (0.01, 10)]
         res = differential_evolution(
             objective_function,
             bounds,
@@ -348,6 +347,7 @@ class WeightSaveCallback(tf.keras.callbacks.Callback):
             "Block": self.block_num,
             "Batch": batch
         }
+
         # Append the row dictionary to the weights_data list
         self.weights_data.append(weights_row)
 
@@ -412,8 +412,6 @@ def objective_function(params, train_input, train_labels, targets, test_label, m
     # Create dictionary with tuple keys and values from the arrays. Format e.g.: (0.5,-0.5,0.5): 0.67315,
     utilities_dict = {tuple(key): value for key, value in zip(permutations, utilities)}
 
-    print("max output: ", max(utilities))
-    print("min output: ", min(utilities))
     # initialise total log likelihood
     total_log_likelihood = 0
 
@@ -566,9 +564,6 @@ def main():
         # Recoding 0 values to -1 in the list
         test_labels = [-1 if label == 0 else label for label in test_labels]
 
-        print(label_array)
-        print(target_array)
-        print(test_labels)
         # Create model for participant
         model = create_model()
 
@@ -595,8 +590,8 @@ def main():
 
             # E.g., Nelder-Mead seems to go for 0 learning rate after a few blocks so let"s try randomly initialising
             # learning rate for each block. Same for temperature
-            learning_rate = random.uniform(0.001, 10.0)
-            temperature = random.uniform(0.01, 50)
+            learning_rate = random.uniform(0.001, 2)
+            temperature = random.uniform(0.01, 10)
 
             # Define method/methods to be used in optimising objective function. Results are stored for the last
             # method in the list. Including multiple methods is mainly for comparing compute times and effectiveness
