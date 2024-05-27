@@ -164,10 +164,10 @@ def weak2_code(Spreadsheet, bug, code_file):
 # Prototype item for label == 0 would be (0,0,0) and correspondingly for label == 1 (1,1,1)
 def decode_features(Spreadsheet, bug, code_file):
 
-    # Get which label each feature value is predictive of
-    strong_value = int(strong_code(Spreadsheet, bug, code_file))
-    weak1_value = int(weak1_code(Spreadsheet, bug, code_file))
-    weak2_value = int(weak2_code(Spreadsheet, bug, code_file))
+    # Get which label each feature value is predictive of and subtract 0.5 (to get -0.5 and 0.5 feature values)
+    strong_value = int(strong_code(Spreadsheet, bug, code_file)) /2
+    weak1_value = int(weak1_code(Spreadsheet, bug, code_file)) /2
+    weak2_value = int(weak2_code(Spreadsheet, bug, code_file)) /2
 
     # Make into tuple to allow for use as dict keys later on. Can also be converted to numpy array
     cleaned_bug = (strong_value, weak1_value, weak2_value)
@@ -175,16 +175,15 @@ def decode_features(Spreadsheet, bug, code_file):
     return cleaned_bug
 
 
-# Create model with zero weight and bias initialisation. 3 units 1 output. Sigmoid activation to deal with 0 and 1 label probabilities
+# Create model with zero weight and bias initialisation. 3 units 1 output
 # Mean squared error to correspond to linear regression. Stochastic GD optimiser
 def create_model(learning_rate=0.01):
     # Define the model
     initializer = Zeros()  # Zero initialisation
     # build Sequential model with three inputs and one output
     model = keras.Sequential([
-        layers.Dense(1, input_shape=(3,), kernel_initializer=initializer, bias_initializer=Zeros(),
-                     activation="sigmoid") # Sigmoid activation for prob output. Otherwise getting label=0 probabilities is difficult
-    ]) # NOTE: sigmoid might not be the correct answer
+        layers.Dense(1, input_shape=(3,), kernel_initializer=initializer, bias_initializer=Zeros())
+    ]) # NOTE: sigmoid might not be the correct answer (Now using linear activation!)
 
     # Configure the optimizer
     optimizer = keras.optimizers.SGD(learning_rate=learning_rate, momentum=0.0)
@@ -198,10 +197,12 @@ def create_model(learning_rate=0.01):
 # Softmax function. Input dictionary of utilities (scores) for each bug permutation, temperature, and label.
 # Output dictionary of softmax probabilities for each bug permutation. Permutations are keys in the dict.
 def softmax(scores_dict, temperature, test_label):
-    # Extract values and apply transformation if test_label is 0
+    # Extract values and apply transformation if test_label is -1
     scores = np.array(list(scores_dict.values()))
-    if test_label == 0:
-        scores = 1 - scores  # Invert scores if test_label is 0. This gives score for permutation being label == 0
+
+    scores = np.clip(scores, -36, 36)
+    if test_label == -1:
+        scores = - scores  # Invert scores if test_label is -1. This gives score for permutation being label == -1
 
     # Get exponent for scores divided by temperature
     # Stability improvement: subtract the max score to prevent overflow
@@ -399,7 +400,6 @@ class ListManager:
 def objective_function(params, train_input, train_labels, targets, test_label, model, permutations, method, weights, list_manager):
     # Get learning rate and temperature
     learning_rate, temperature = params
-
     # Update the learning rate of the model"s existing optimizer
     tf.keras.backend.set_value(model.optimizer.learning_rate, learning_rate)
     # Set model weights to the end of the previous block
@@ -409,9 +409,11 @@ def objective_function(params, train_input, train_labels, targets, test_label, m
 
     # Get utilities for all 8 permutations from model
     utilities = model.predict(permutations).flatten()
-    # Create dictionary with tuple keys and values from the arrays. Format e.g.: (1,0,1): 0.67315,
+    # Create dictionary with tuple keys and values from the arrays. Format e.g.: (0.5,-0.5,0.5): 0.67315,
     utilities_dict = {tuple(key): value for key, value in zip(permutations, utilities)}
 
+    print("max output: ", max(utilities))
+    print("min output: ", min(utilities))
     # initialise total log likelihood
     total_log_likelihood = 0
 
@@ -422,7 +424,6 @@ def objective_function(params, train_input, train_labels, targets, test_label, m
     for target in targets:
         # calculate softmax probabilities for the current set of choices
         probabilities_dict = softmax(utilities_dict, temperature, test_label)
-
         # Get the probability of the participant choice
         target_prob = probabilities_dict[target]
 
@@ -466,7 +467,7 @@ def main():
     # Exclude participants
     exclude_ids = pd.read_csv("../data/exclusions.csv")
 
-    # Check Rows where id doesn"t match with exlusion
+    # Check Rows where id doesn't match with exclusion
     test_mask = ~test_data["id"].isin(exclude_ids["id"])
     train_mask = ~train_data["id"].isin(exclude_ids["id"])
 
@@ -477,10 +478,10 @@ def main():
     # Read code file
     code_file = pd.read_csv("../data/fullcode.csv", delimiter=";")
 
-    # Change labels to 0 and 1 instead of 1 and 2
-    code_file["bug_id"] = code_file["bug_id"].astype("int") - 1
+    # Change labels from 1 and 2 to -0.5 and 0.5
+    code_file["bug_id"] = code_file["bug_id"].astype("int") - 1.5
 
-    # Decode original bug representations to standardised format. (e.g., 21211 --> (1,0,1))
+    # Decode original bug representations to standardised format. (e.g., 21211 --> (0.5,-0.5,0.5))
     train_data_modified_path = "data/train_data_standardised.csv"
     # Check if file (path) already exists
     # If not
@@ -527,19 +528,19 @@ def main():
 
     # Define all bug permutations for forward pass and softmax
     permutations = np.array([
-    [0, 0, 0],
-    [0, 0, 1],
-    [0, 1, 0],
-    [0, 1, 1],
-    [1, 0, 0],
-    [1, 0, 1],
-    [1, 1, 0],
-    [1, 1, 1]
+        [-0.5, -0.5, -0.5],
+        [-0.5, -0.5, 0.5],
+        [-0.5, 0.5, -0.5],
+        [-0.5, 0.5, 0.5],
+        [0.5, -0.5, -0.5],
+        [0.5, -0.5, 0.5],
+        [0.5, 0.5, -0.5],
+        [0.5, 0.5, 0.5]
 ])
     # Initialise Keras callback to save weights after each batch
     callback = WeightSaveCallback(part_ids[0], 0)
 
-    # Intialise per block output dataframe (individual trial weights in separate object & file)
+    # Initialise per block output dataframe (individual trial weights in separate object & file)
     data_df = pd.DataFrame(columns=["id", "block", "neg_logl", "learning_rate", "temperature", "strong", "weak1", "weak2"])
 
     # For each participant
@@ -555,11 +556,19 @@ def main():
         # Convert the list of lists (for each block) into a numpy array
         input_array = [np.array(block) for block in grouped_input]
         label_array = [np.array(block) for block in grouped_label]
+        # Recoding 0 values to -1 in each array
+        label_array = [np.where(block == 0, -1, block) for block in label_array]
 
         # Get the test data for a given participant
         id_test_data = test_data[test_data["id"] == id]
         target_array = id_test_data["targets"].tolist()
         test_labels = id_test_data["label"].tolist()
+        # Recoding 0 values to -1 in the list
+        test_labels = [-1 if label == 0 else label for label in test_labels]
+
+        print(label_array)
+        print(target_array)
+        print(test_labels)
         # Create model for participant
         model = create_model()
 
@@ -586,8 +595,8 @@ def main():
 
             # E.g., Nelder-Mead seems to go for 0 learning rate after a few blocks so let"s try randomly initialising
             # learning rate for each block. Same for temperature
-            learning_rate = random.uniform(0.001, 3.0)
-            temperature = random.uniform(0.01, 10)
+            learning_rate = random.uniform(0.001, 10.0)
+            temperature = random.uniform(0.01, 50)
 
             # Define method/methods to be used in optimising objective function. Results are stored for the last
             # method in the list. Including multiple methods is mainly for comparing compute times and effectiveness
