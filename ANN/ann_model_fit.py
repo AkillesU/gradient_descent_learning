@@ -11,11 +11,14 @@ import ast
 from scipy.optimize import differential_evolution, dual_annealing
 import random
 import time
+from pympler import tracker
 import gc
 import pyswarms as ps
 from pyswarms.utils.functions import single_obj as fx
 import matplotlib.pyplot as plt
 tqdm.pandas()  # This enables `progress_apply` functionality
+# Initialize the memory tracker
+tr = tracker.SummaryTracker()
 
 """
 This script is for behavioural modelling of human data in the GD learning project.
@@ -442,6 +445,7 @@ def objective_function(params, train_input, train_labels, targets, test_label, m
 
     print(temperature, learning_rate, total_log_likelihood)
     print(method)
+
     # Return negative log likelihood
     return -total_log_likelihood
 
@@ -569,7 +573,7 @@ def main():
 
         # Process each training block for participant
         for block in range(0,10):
-
+            tr.print_diff()
             if block == 0:
                 # Get zero initialised weights if first block
                 best_weights = model.get_weights()
@@ -620,7 +624,7 @@ def main():
                 # Append optimisation results to empty list
                 results.append((method, best_nlgl, best_lr, best_temp, comp_time))
             print(results)
-            #plot_loss_curve(losses)
+            plot_loss_curve(losses)
             # Get best weights from model. Used to initialise models for next block.
             best_weights = best_model.get_weights()
 
@@ -649,6 +653,7 @@ def main():
             # Update model (redundant?)
             model = best_model
             print(data_df)
+
         print(data_df)
 
         gc.collect()
