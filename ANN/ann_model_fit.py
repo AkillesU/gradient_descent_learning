@@ -624,7 +624,7 @@ def main():
                 # Append optimisation results to empty list
                 results.append((method, best_nlgl, best_lr, best_temp, comp_time))
             print(results)
-            plot_loss_curve(losses)
+            #plot_loss_curve(losses)
             # Get best weights from model. Used to initialise models for next block.
             best_weights = best_model.get_weights()
 
