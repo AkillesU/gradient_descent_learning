@@ -16,9 +16,9 @@ import gc
 import pyswarms as ps
 from pyswarms.utils.functions import single_obj as fx
 import matplotlib.pyplot as plt
+from memory_profiler import profile
 tqdm.pandas()  # This enables `progress_apply` functionality
-# Initialize the memory tracker
-tr = tracker.SummaryTracker()
+
 
 """
 This script is for behavioural modelling of human data in the GD learning project.
@@ -309,7 +309,7 @@ def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_
     tf.keras.backend.set_value(model.optimizer.learning_rate, best_lr)
     model.set_weights(weights)
     # Train model
-    model.fit(train_input, train_labels, shuffle=False, batch_size=1, verbose=2,
+    model.fit(train_input, train_labels, shuffle=False, batch_size=1, verbose=0,
               callbacks=[callback])
 
     # Save weights to csv
@@ -411,7 +411,7 @@ def objective_function(params, train_input, train_labels, targets, test_label, m
     model.fit(train_input, train_labels, shuffle=False, batch_size=1, verbose=0)
 
     # Get utilities for all 8 permutations from model
-    utilities = model.predict(permutations).flatten()
+    utilities = model.predict(permutations, verbose=0).flatten()
     # Create dictionary with tuple keys and values from the arrays. Format e.g.: (0.5,-0.5,0.5): 0.67315,
     utilities_dict = {tuple(key): value for key, value in zip(permutations, utilities)}
 
@@ -443,8 +443,8 @@ def objective_function(params, train_input, train_labels, targets, test_label, m
     # Update probabilities list in ListManager
     list_manager.set_list(new_list=probabilities)
 
-    print(temperature, learning_rate, total_log_likelihood)
-    print(method)
+    #print(temperature, learning_rate, total_log_likelihood)
+    #print(method)
 
     # Return negative log likelihood
     return -total_log_likelihood
@@ -460,7 +460,14 @@ def plot_loss_curve(losses):
     plt.show()
 
 
+def reset_keras(model):
+    tf.keras.backend.clear_session()
+    del model
+    gc.collect()
+
+
 # Main function
+
 def main():
     # First we need to load in the participant data.
     test_data = pd.read_csv("data/test_data.csv")
@@ -573,7 +580,6 @@ def main():
 
         # Process each training block for participant
         for block in range(0,10):
-            tr.print_diff()
             if block == 0:
                 # Get zero initialised weights if first block
                 best_weights = model.get_weights()
@@ -624,6 +630,7 @@ def main():
                 # Append optimisation results to empty list
                 results.append((method, best_nlgl, best_lr, best_temp, comp_time))
             print(results)
+            reset_keras(model)
             #plot_loss_curve(losses)
             # Get best weights from model. Used to initialise models for next block.
             best_weights = best_model.get_weights()
