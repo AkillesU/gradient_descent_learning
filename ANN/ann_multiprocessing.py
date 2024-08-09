@@ -169,13 +169,12 @@ def weak2_code(Spreadsheet, bug, code_file):
 def decode_features(Spreadsheet, bug, code_file):
 
     # Get which label each feature value is predictive of and subtract 0.5 (to get -0.5 and 0.5 feature values)
-    strong_value = int(strong_code(Spreadsheet, bug, code_file)) /2
-    weak1_value = int(weak1_code(Spreadsheet, bug, code_file)) /2
-    weak2_value = int(weak2_code(Spreadsheet, bug, code_file)) /2
+    strong_value = strong_code(Spreadsheet, bug, code_file)
+    weak1_value = weak1_code(Spreadsheet, bug, code_file)
+    weak2_value = weak2_code(Spreadsheet, bug, code_file)
 
     # Make into tuple to allow for use as dict keys later on. Can also be converted to numpy array
     cleaned_bug = (strong_value, weak1_value, weak2_value)
-
     return cleaned_bug
 
 
@@ -241,7 +240,7 @@ def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_
             args=(train_input, train_labels, targets, test_label, model, permutations, method, weights, list_manager),
             method="Nelder-Mead",
             options={"maxiter": 100},
-            bounds=[(0.001, 5.0), (0.01, 10)]
+            bounds=[(0.001, 1), (0.01, 10)]
         )
     elif method == "SLSQP":
         res = optimize.minimize(
@@ -253,7 +252,7 @@ def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_
             bounds=[(0.001, 5.0), (0.01, 10)]
         )
     elif method == "Differential Evolution":
-        bounds = [(0.001, 2), (0.01, 10)]
+        bounds = [(0.001, 1), (0.01, 10)]
         res = differential_evolution(
             objective_function,
             bounds,
@@ -264,14 +263,14 @@ def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_
             tol=0.001,
             mutation=(0.6, 1.99),
             recombination=0.8,
-            seed=None,
+            seed=1234,
             callback=loss_callback,
             disp=False,
             polish=True,
             init="sobol"
         )
     elif method == "Dual Annealing":
-        bounds = [(0.001, 5.0), (0.01, 10)]
+        bounds = [(0.001, 1), (0.01, 10)]
         res = dual_annealing(
             objective_function,
             bounds,
@@ -290,7 +289,7 @@ def optimiser(method, initial_lr, initial_temp, train_input, train_labels, test_
             minimizer_kwargs={
                 "method": "L-BFGS-B",
                 "args": (train_input, train_labels, targets, test_label, model, permutations, method, weights),
-                "bounds": [(0.001, 5.0), (0.01, 10)]
+                "bounds": [(0.001, 1), (0.01, 10)]
             }
         )
 
@@ -496,7 +495,7 @@ def process_participant(id, train_data, test_data, code_file, permutations):
         callback.set_participant_block(id, block)
         list_manager = ListManager()
 
-        learning_rate = random.uniform(0.001, 2)
+        learning_rate = random.uniform(0.001, 1)
         temperature = random.uniform(0.01, 10)
         methods = ["Differential Evolution"]
         results = []
@@ -540,6 +539,15 @@ def process_participant(id, train_data, test_data, code_file, permutations):
 
         participant_results.append(new_data)
 
+    # Save participant results to CSV after processing each participant
+    participant_df = pd.DataFrame(participant_results)
+    if os.path.exists("data/model_fit.csv"):
+        existing_df = pd.read_csv("data/model_fit.csv")
+        combined_df = pd.concat([existing_df, participant_df], ignore_index=True)
+    else:
+        combined_df = participant_df
+    combined_df.to_csv("data/model_fit.csv", index=False)
+
     print(f"Participant {id} results: \n {participant_results}")
     gc.collect()
     return participant_results
@@ -548,7 +556,7 @@ def process_participant(id, train_data, test_data, code_file, permutations):
 def main():
     test_data = pd.read_csv("data/test_data.csv")
     train_data = pd.read_csv("data/train_data.csv")
-    exclude_ids = pd.read_csv("../data/exclusions.csv")
+    exclude_ids = pd.read_csv("../data/processed_exclusions.csv")
     test_mask = ~test_data["id"].isin(exclude_ids["id"])
     train_mask = ~train_data["id"].isin(exclude_ids["id"])
     test_data = test_data[test_mask]
@@ -589,7 +597,7 @@ def main():
         [0.5, 0.5, 0.5]
     ])
 
-    num_cores = min(16, cpu_count())
+    num_cores = min(4, cpu_count())
     pool = Pool(processes=num_cores)
 
     results = pool.starmap(process_participant, [(id, train_data, test_data, code_file, permutations) for id in part_ids])
